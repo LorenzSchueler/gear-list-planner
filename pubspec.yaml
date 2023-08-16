@@ -28,9 +28,14 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+  collection: ^1.17.0
   json_annotation: ^4.8.1
   flutter:
     sdk: flutter
+  provider: ^6.0.2 # state management
+  sqflite: ^2.3.0
+  sqflite_common_ffi_web: ^0.4.0
+    # dart run sqflite_common_ffi_web:setup --force
 
 
 dev_dependencies:
@@ -39,6 +44,8 @@ dev_dependencies:
   flutter_lints: ^2.0.1
   flutter_test:
     sdk: flutter
+  icons_launcher: ^2.0.1 
+    # dart run icons_launcher:create
   json_serializable: ^6.3.0
 
 
