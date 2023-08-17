@@ -53,7 +53,7 @@ GearItem _$GearItemFromJson(Map<String, dynamic> json) => GearItem(
       id: GearItemId(json['id'] as int),
       gearCategoryId: GearCategoryId(json['gear_category_id'] as int),
       name: json['name'] as String,
-      weight: (json['weight'] as num).toDouble(),
+      weight: json['weight'] as int,
       sortIndex: json['sort_index'] as int,
     );
 

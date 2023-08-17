@@ -155,7 +155,7 @@ class GearItem extends Entity<GearItemId> implements Comparable<GearItem> {
   @JsonKey(fromJson: GearCategoryId.new, toJson: Id._toJson)
   GearCategoryId gearCategoryId;
   String name;
-  double weight;
+  int weight;
   int sortIndex;
 
   @override

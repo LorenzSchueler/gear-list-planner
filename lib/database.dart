@@ -12,7 +12,6 @@ abstract final class AppDatabase {
       version: 1,
       onCreate: (db, version) async {
         const integer = "integer not null";
-        const double = "real not null";
         const string = "text not null";
 
         String intColumn(String column) => "$column $integer";
@@ -20,7 +19,6 @@ abstract final class AppDatabase {
             "${intColumn(column)} check($column in (0, 1))";
         String fkColumn(String column, String table) =>
             "${intColumn(column)} references $table on delete cascade";
-        String doubleColumn(String column) => "$column $double";
         String stringColumn(String column) => "$column $string";
 
         final idColumn = "${intColumn(Columns.id)} primary key";
@@ -58,7 +56,7 @@ abstract final class AppDatabase {
           idColumn,
           fkColumn(Columns.gearCategoryId, Tables.gearCategory),
           nameColumn,
-          doubleColumn(Columns.weight),
+          intColumn(Columns.weight),
           intColumn(Columns.sortIndex),
           unique([Columns.name]),
         ]);
