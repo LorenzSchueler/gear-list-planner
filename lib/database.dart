@@ -2,12 +2,13 @@ import 'package:gear_list_planner/model.dart';
 import 'package:sqflite/sqflite.dart';
 
 abstract final class AppDatabase {
-  static Database? _database;
-  static Database get database => _database!;
+  static late final Database database;
+
+  static const _databasePath = "gear_list_planner.sqlite";
 
   static Future<void> init() async {
-    _database = await openDatabase(
-      "gear_list_planner.sqlite",
+    database = await openDatabase(
+      _databasePath,
       version: 1,
       onCreate: (db, version) async {
         const integer = "integer not null";
@@ -75,9 +76,15 @@ abstract final class AppDatabase {
         await db.execute(gearListItemTable);
       },
       onOpen: (db) async {
-        await db.execute("pragma foreign_key = on;");
+        await db.execute("pragma foreign_keys = on;");
       },
     );
+  }
+
+  static Future<void> clearDatabase() async {
+    await database.delete(Tables.gearList, where: "1=?", whereArgs: [1]);
+    await database.delete(Tables.gearCategory, where: "1=?", whereArgs: [1]);
+    // other tables deleted by cascading delete
   }
 }
 
@@ -126,9 +133,8 @@ abstract class TableAccessor<I extends Id, E extends Entity<I>> {
   }
 
   Future<void> delete(E object) async {
-    await database.update(
+    await database.delete(
       tableName,
-      toDbRecord(object),
       where: "${Columns.id} = ?",
       whereArgs: [object.id.id],
     );
@@ -148,7 +154,7 @@ abstract class TableAccessor<I extends Id, E extends Entity<I>> {
     return data.map(fromDbRecord).toList();
   }
 
-  String fullyQualifiedNames(String table, List<String> columns) {
+  String _fullyQualifiedNames(String table, List<String> columns) {
     return columns
         .map((column) => "$table.$column as '$table.$column'")
         .join(",\n");
@@ -211,20 +217,21 @@ class GearListItemAccessor extends TableAccessor<GearListItemId, GearListItem> {
   @override
   String tableName = Tables.gearListItem;
 
-  Future<List<(GearListItem, GearItem)>> getWithItemByGearCategoryId(
+  Future<List<(GearListItem, GearItem)>> getWithItemByVersionAndCategory(
+    GearListVersionId gearListVersionId,
     GearCategoryId gearCategoryId,
   ) async {
     final data = await TableAccessor.database.rawQuery(
       """
       select 
-        ${fullyQualifiedNames(Tables.gearListItem, [
+        ${_fullyQualifiedNames(Tables.gearListItem, [
             Columns.id,
             Columns.gearItemId,
             Columns.gearListVersionId,
             Columns.count,
             Columns.packed,
           ])},
-        ${fullyQualifiedNames(Tables.gearItem, [
+        ${_fullyQualifiedNames(Tables.gearItem, [
             Columns.id,
             Columns.gearCategoryId,
             Columns.name,
@@ -234,7 +241,8 @@ class GearListItemAccessor extends TableAccessor<GearListItemId, GearListItem> {
       from ${Tables.gearListItem}
       inner join ${Tables.gearItem}
       on ${Tables.gearListItem}.${Columns.gearItemId} = ${Tables.gearItem}.${Columns.id}
-      where ${Tables.gearItem}.${Columns.gearCategoryId} = ${gearCategoryId.id};
+      where ${Tables.gearListItem}.${Columns.gearListVersionId} = ${gearListVersionId.id}
+      and ${Tables.gearItem}.${Columns.gearCategoryId} = ${gearCategoryId.id};
       """,
     );
     return data.map((joined) {
