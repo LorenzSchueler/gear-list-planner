@@ -140,7 +140,7 @@ class GearItem extends Entity<GearItemId> implements Comparable<GearItem> {
     required this.gearCategoryId,
     required this.name,
     required this.weight,
-    required this.index,
+    required this.sortIndex,
   });
 
   factory GearItem.fromJson(Map<String, dynamic> json) =>
@@ -156,10 +156,10 @@ class GearItem extends Entity<GearItemId> implements Comparable<GearItem> {
   GearCategoryId gearCategoryId;
   String name;
   double weight;
-  int index;
+  int sortIndex;
 
   @override
-  int compareTo(GearItem other) => index.compareTo(other.index);
+  int compareTo(GearItem other) => sortIndex.compareTo(other.sortIndex);
 }
 
 class GearCategoryId implements Id {

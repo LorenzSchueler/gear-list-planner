@@ -49,7 +49,7 @@ abstract final class AppDatabase {
           fkColumn(Columns.gearCategoryId, Tables.gearCategory),
           nameColumn,
           realColumn(Columns.weight),
-          intColumn(Columns.index)
+          intColumn(Columns.sortIndex)
         ]);
 
         final gearCategoryTable =
@@ -79,7 +79,7 @@ abstract final class Tables {
 abstract final class Columns {
   static const count = "count";
   static const id = "id";
-  static const index = "index_"; // _ to distinguish from keyword
+  static const sortIndex = "sort_index";
   static const gearListId = "gear_list_id";
   static const gearListVersionId = "gear_list_version_id";
   static const gearListItemId = "gear_list_item_id";

@@ -54,7 +54,7 @@ GearItem _$GearItemFromJson(Map<String, dynamic> json) => GearItem(
       gearCategoryId: GearCategoryId(json['gear_category_id'] as int),
       name: json['name'] as String,
       weight: (json['weight'] as num).toDouble(),
-      index: json['index'] as int,
+      sortIndex: json['sort_index'] as int,
     );
 
 Map<String, dynamic> _$GearItemToJson(GearItem instance) => <String, dynamic>{
@@ -62,7 +62,7 @@ Map<String, dynamic> _$GearItemToJson(GearItem instance) => <String, dynamic>{
       'gear_category_id': Id._toJson(instance.gearCategoryId),
       'name': instance.name,
       'weight': instance.weight,
-      'index': instance.index,
+      'sort_index': instance.sortIndex,
     };
 
 GearCategory _$GearCategoryFromJson(Map<String, dynamic> json) => GearCategory(
