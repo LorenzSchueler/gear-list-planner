@@ -41,7 +41,7 @@ jobs:
     - name: flutter analyze
       run: flutter analyze
 
-  build-linux:
+  build-web:
     name: build web
     runs-on: ubuntu-20.04
 
