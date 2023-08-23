@@ -29,9 +29,10 @@ environment:
 # versions available, run `flutter pub outdated`.
 dependencies:
   collection: ^1.17.0
-  json_annotation: ^4.8.1
+  file_picker: ^5.3.3
   flutter:
     sdk: flutter
+  json_annotation: ^4.8.1
   provider: ^6.0.2 # state management
   sqflite: ^2.3.0
   sqflite_common_ffi_web: ^0.4.0
