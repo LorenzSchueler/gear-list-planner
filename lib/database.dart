@@ -21,7 +21,7 @@ abstract final class AppDatabase {
             "${intColumn(column)} references $table on delete cascade";
         String stringColumn(String column) => "$column $string";
 
-        final idColumn = "${intColumn(Columns.id)} primary key";
+        final idColumn = "${intColumn(Columns.id)} primary key autoincrement";
         final nameColumn = stringColumn(Columns.name);
 
         String unique(List<String> columns) => "unique(${columns.join(', ')})";
@@ -117,8 +117,12 @@ abstract class TableAccessor<I extends Id, E extends Entity<I>> {
 
   String get tableName;
 
-  Future<void> create(E object) async {
-    await database.insert(tableName, toDbRecord(object));
+  Future<int> create(E object, bool autoId) async {
+    final record = toDbRecord(object);
+    if (autoId) {
+      record.remove(Columns.id);
+    }
+    return database.insert(tableName, record);
   }
 
   Future<void> update(E object) async {
@@ -280,6 +284,18 @@ class GearItemAccessor extends TableAccessor<GearItemId, GearItem> {
 
   @override
   String tableName = Tables.gearItem;
+
+  Future<int> getMaxSortIndexForCategory(
+    GearCategoryId gearCategoryId,
+  ) async {
+    final id = await TableAccessor.database.query(
+      Tables.gearItem,
+      columns: ["max(${Columns.sortIndex}) as max_sort_index"],
+      where: "${Columns.gearCategoryId} = ?",
+      whereArgs: [gearCategoryId.id],
+    );
+    return id.single["max_sort_index"] as int? ?? -1;
+  }
 
   Future<List<GearItem>> getByGearCategoryId(
     GearCategoryId gearCategoryId,
