@@ -1,0 +1,56 @@
+name: Flutter
+
+permissions:
+  contents: read
+  checks: write
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  format:
+    name: format
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: checkout
+      uses: actions/checkout@v3
+    - name: install flutter
+      uses: subosito/flutter-action@v2
+      with:
+        cache: true
+    - name: dart format
+      run: dart format --set-exit-if-changed .
+
+  analyze:
+    name: analize
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: checkout
+      uses: actions/checkout@v3
+    - name: install flutter
+      uses: subosito/flutter-action@v2
+      with:
+        cache: true
+    - name: flutter pub get
+      run: flutter pub get
+    - name: flutter analyze
+      run: flutter analyze
+
+  build-linux:
+    name: build web
+    runs-on: ubuntu-20.04
+
+    steps:
+    - name: checkout
+      uses: actions/checkout@v3
+    - name: install flutter
+      uses: subosito/flutter-action@v2
+      with:
+        cache: true
+    - name: flutter build web
+      run: flutter build web --release
