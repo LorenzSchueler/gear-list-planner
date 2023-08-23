@@ -2,45 +2,21 @@ name: GH-Pages
 
 on:
   push:
-    branches: [ gh-pages-deploy ]
+    branches: 
+      - gh-pages
 
-inputs:
-  name:
-    description: "Artifact name"
-    required: false
-    default: "github-pages"
-  path:
-    description: "Path of the directory containing the static assets."
-    required: true
-    default: "web/"
-  retention-days:
-    description: "Duration after which artifact will expire in days."
-    required: false
-    default: "1"
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
 
 jobs:
-  build:
-    name: build
+  deploy:
+    name: deploy
 
     permissions:
       contents: read
-
-    runs-on: ubuntu-20.04
-
-    steps:
-    - name: checkout
-      uses: actions/checkout@v3
-    - name: install flutter
-      uses: subosito/flutter-action@v2
-      with:
-        cache: true
-    - name: flutter build web
-      run: flutter build web --release
-
-  deploy:
-    needs: build
-
-    permissions:
       pages: write    
       id-token: write
 
@@ -51,26 +27,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: archive artifact
-          shell: sh
-          if: runner.os == 'Linux'
-          run: |
-            tar \
-              --dereference --hard-dereference \
-              --directory "$INPUT_PATH" \
-              -cvf "$RUNNER_TEMP/artifact.tar" \
-              --exclude=.git \
-              --exclude=.github \
-              .
-          env:
-            INPUT_PATH: ${{ inputs.path }}
-      - name: Upload artifact
-        uses: actions/upload-artifact@v3
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: install flutter
+        uses: subosito/flutter-action@v2
         with:
-          name: ${{ inputs.name }}
-          path: ${{ runner.temp }}/artifact.tar
-          retention-days: ${{ inputs.retention-days }}
-          if-no-files-found: error
+          cache: true
+      - name: flutter build web
+        run: flutter build web --release --base-href /gear-list-planner/
+      - name: configure pages
+        uses: actions/configure-pages@v3
+      - name: upload artifact
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: ./build/web
       - name: deploy to gh pages
         id: deployment
         uses: actions/deploy-pages@v2 
