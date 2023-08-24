@@ -362,7 +362,18 @@ class GearItemOverviewDataProvider extends ChangeNotifier {
     int oldIndex,
     int newIndex,
   ) async {
-    // TODO
+    final all = await gearItemDataProvider.getByGearCategoryId(gearCategoryId);
+
+    if (oldIndex < newIndex - 1) {
+      final item = all.removeAt(oldIndex);
+      all.insert(newIndex - 1, item);
+    } else if (oldIndex > newIndex) {
+      all.insert(newIndex, all.removeAt(oldIndex));
+    }
+
+    all.forEachIndexed((index, item) => item..sortIndex = index);
+
+    await gearItemDataProvider.updateMultiple(all);
   }
 }
 
