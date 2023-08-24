@@ -5,9 +5,16 @@ import 'package:gear_list_planner/model.dart';
 import 'package:provider/provider.dart';
 
 class GearListOverview extends StatelessWidget {
-  const GearListOverview({super.key, required this.onSelectGearListVersion});
+  const GearListOverview({
+    super.key,
+    required this.onSelectGearListVersion,
+    required this.onToggleCompareGearListVersion,
+    required this.selectedCompare,
+  });
 
   final void Function(GearListVersion) onSelectGearListVersion;
+  final void Function(GearListVersion) onToggleCompareGearListVersion;
+  final (GearListVersion?, GearListVersion?) selectedCompare;
 
   @override
   Widget build(BuildContext context) {
@@ -140,9 +147,18 @@ class GearListOverview extends StatelessWidget {
                                   },
                                   icon: const Icon(Icons.delete_rounded),
                                 ),
-                                const IconButton(
-                                  onPressed: null, // TODO
-                                  icon: Icon(Icons.compare_rounded),
+                                IconButton(
+                                  onPressed: () =>
+                                      onToggleCompareGearListVersion(
+                                    gearListVersion,
+                                  ),
+                                  icon: Icon(
+                                    gearListVersion == selectedCompare.$1 ||
+                                            gearListVersion ==
+                                                selectedCompare.$2
+                                        ? Icons.check_circle_outline_rounded
+                                        : Icons.compare_rounded,
+                                  ),
                                 ),
                               ],
                             );

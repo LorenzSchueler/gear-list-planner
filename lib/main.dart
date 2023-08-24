@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:gear_list_planner/data_provider.dart';
 import 'package:gear_list_planner/database.dart';
 import 'package:gear_list_planner/gear_item_overview.dart';
+import 'package:gear_list_planner/gear_list_compare.dart';
 import 'package:gear_list_planner/gear_list_details.dart';
 import 'package:gear_list_planner/gear_list_overview.dart';
 import 'package:gear_list_planner/model.dart';
@@ -63,7 +64,10 @@ class _InitAppWrapperState extends State<InitAppWrapper> {
                 create: (_) => GearItemOverviewDataProvider(),
                 child: ChangeNotifierProvider(
                   create: (_) => GearListDetailsDataProvider(),
-                  child: const App(),
+                  child: ChangeNotifierProvider(
+                    create: (_) => GearListCompareDataProvider(),
+                    child: const App(),
+                  ),
                 ),
               ),
             ),
@@ -80,15 +84,48 @@ class App extends StatefulWidget {
 }
 
 class _AppState extends State<App> with TickerProviderStateMixin {
-  GearListVersion? _gearListVersion;
-  void _setGearListVersion(GearListVersion? gearListVersion) {
+  void _updateTabController(bool addDetails) {
+    final currentIndex = _tabController.index;
+    final oldLength = _tabController.length;
+    final length = 2 +
+        (_gearListVersion != null ? 1 : 0) +
+        (_gearListVersionCompare.$2 != null ? 1 : 0);
     _tabController.dispose();
     _tabController = TabController(
-      length: gearListVersion == null ? 2 : 3,
-      initialIndex: gearListVersion == null ? 0 : 2,
+      length: length,
+      initialIndex: addDetails
+          ? 2
+          : oldLength == length
+              ? currentIndex
+              : oldLength > length
+                  ? 0
+                  : length - 1,
       vsync: this,
     );
+  }
+
+  GearListVersion? _gearListVersion;
+  void _setGearListVersion(GearListVersion? gearListVersion) {
     setState(() => _gearListVersion = gearListVersion);
+    _updateTabController(true);
+  }
+
+  (GearListVersion?, GearListVersion?) _gearListVersionCompare = (null, null);
+  (GearListVersion?, GearListVersion?) get gearListVersionCompare =>
+      _gearListVersionCompare;
+  void _toggleCompareGearListVersion(GearListVersion gearListVersion) {
+    final (GearListVersion?, GearListVersion?) gearListVersionCompare;
+    if (gearListVersion == _gearListVersionCompare.$2) {
+      gearListVersionCompare = (_gearListVersionCompare.$1, null);
+    } else if (gearListVersion == _gearListVersionCompare.$1) {
+      gearListVersionCompare = (_gearListVersionCompare.$2, null);
+    } else if (_gearListVersionCompare.$1 == null) {
+      gearListVersionCompare = (gearListVersion, null);
+    } else {
+      gearListVersionCompare = (_gearListVersionCompare.$1, gearListVersion);
+    }
+    setState(() => _gearListVersionCompare = gearListVersionCompare);
+    _updateTabController(false);
   }
 
   late TabController _tabController = TabController(length: 2, vsync: this);
@@ -130,17 +167,34 @@ class _AppState extends State<App> with TickerProviderStateMixin {
                 text: _gearListVersion!.name,
                 icon: const Icon(Icons.check_box_rounded),
               ),
+            if (_gearListVersionCompare.$2 != null)
+              Tab(
+                text:
+                    "${_gearListVersionCompare.$1!.name} - ${_gearListVersionCompare.$2!.name}",
+                icon: const Icon(Icons.check_box_rounded),
+              ),
           ],
         ),
       ),
       body: TabBarView(
         controller: _tabController,
         children: [
-          GearListOverview(onSelectGearListVersion: _setGearListVersion),
+          GearListOverview(
+            onSelectGearListVersion: _setGearListVersion,
+            onToggleCompareGearListVersion: _toggleCompareGearListVersion,
+            selectedCompare: _gearListVersionCompare,
+          ),
           const GearItemOverview(),
           if (_gearListVersion != null)
             GearListDetailsLoadWrapper(
               gearListVersionId: _gearListVersion!.id,
+            ),
+          if (_gearListVersionCompare.$2 != null)
+            GearListCompareLoadWrapper(
+              gearListVersionIds: (
+                _gearListVersionCompare.$1!.id,
+                _gearListVersionCompare.$2!.id
+              ),
             ),
         ],
       ),
