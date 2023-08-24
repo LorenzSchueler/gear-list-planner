@@ -12,6 +12,13 @@ abstract class Entity<I extends Id> {
   I get id;
 
   Map<String, dynamic> toJson();
+
+  @override
+  bool operator ==(other) =>
+      other is Entity && other.runtimeType == runtimeType && other.id == id;
+
+  @override
+  int get hashCode => id.hashCode;
 }
 
 class GearListId implements Id {
@@ -25,6 +32,9 @@ class GearListId implements Id {
 
   @override
   int get hashCode => id.hashCode;
+
+  @override
+  String toString() => id.toString();
 }
 
 @JsonSerializable()
@@ -41,6 +51,9 @@ class GearList extends Entity<GearListId> {
   @JsonKey(fromJson: GearListId.new, toJson: Id._toJson)
   GearListId id;
   String name;
+
+  @override
+  String toString() => id.toString();
 }
 
 class GearListVersionId implements Id {
@@ -54,6 +67,9 @@ class GearListVersionId implements Id {
 
   @override
   int get hashCode => id.hashCode;
+
+  @override
+  String toString() => id.toString();
 }
 
 @JsonSerializable()
@@ -78,6 +94,9 @@ class GearListVersion extends Entity<GearListVersionId> {
   GearListId gearListId;
   String name;
   bool readOnly;
+
+  @override
+  String toString() => id.toString();
 }
 
 class GearListItemId implements Id {
@@ -91,6 +110,9 @@ class GearListItemId implements Id {
 
   @override
   int get hashCode => id.hashCode;
+
+  @override
+  String toString() => id.toString();
 }
 
 @JsonSerializable()
@@ -118,6 +140,9 @@ class GearListItem extends Entity<GearListItemId> {
   GearListVersionId gearListVersionId;
   int count;
   bool packed;
+
+  @override
+  String toString() => id.toString();
 }
 
 class GearItemId implements Id {
@@ -131,6 +156,9 @@ class GearItemId implements Id {
 
   @override
   int get hashCode => id.hashCode;
+
+  @override
+  String toString() => id.toString();
 }
 
 @JsonSerializable()
@@ -160,6 +188,9 @@ class GearItem extends Entity<GearItemId> implements Comparable<GearItem> {
 
   @override
   int compareTo(GearItem other) => sortIndex.compareTo(other.sortIndex);
+
+  @override
+  String toString() => id.toString();
 }
 
 class GearCategoryId implements Id {
@@ -173,6 +204,9 @@ class GearCategoryId implements Id {
 
   @override
   int get hashCode => id.hashCode;
+
+  @override
+  String toString() => id.toString();
 }
 
 @JsonSerializable()
@@ -189,6 +223,9 @@ class GearCategory extends Entity<GearCategoryId> {
   @JsonKey(fromJson: GearCategoryId.new, toJson: Id._toJson)
   final GearCategoryId id;
   String name;
+
+  @override
+  String toString() => id.toString();
 }
 
 @JsonSerializable()
