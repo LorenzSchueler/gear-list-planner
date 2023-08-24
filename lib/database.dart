@@ -276,6 +276,110 @@ class GearListItemAccessor extends TableAccessor<GearListItemId, GearListItem> {
       return (gearListItem, gearItem);
     }).toList();
   }
+
+  Future<List<((GearListItem?, GearListItem?), GearItem)>>
+      getWithItemByVersionsAndCategory(
+    (GearListVersionId, GearListVersionId) gearListVersionIds,
+    GearCategoryId gearCategoryId,
+  ) async {
+    const tableGearListItem2 = "gear_list_item_2";
+    final data = await TableAccessor.database.rawQuery(
+      """
+      select 
+        ${_fullyQualifiedNames(Tables.gearListItem, [
+            Columns.id,
+            Columns.gearItemId,
+            Columns.gearListVersionId,
+            Columns.count,
+            Columns.packed,
+          ])},
+        ${_fullyQualifiedNames(tableGearListItem2, [
+            Columns.id,
+            Columns.gearItemId,
+            Columns.gearListVersionId,
+            Columns.count,
+            Columns.packed,
+          ])},
+        ${_fullyQualifiedNames(Tables.gearItem, [
+            Columns.id,
+            Columns.gearCategoryId,
+            Columns.name,
+            Columns.weight,
+            Columns.sortIndex,
+          ])}
+      from ${Tables.gearItem}
+      left outer join (
+        select * from ${Tables.gearListItem}
+        where ${Tables.gearListItem}.${Columns.gearListVersionId} = ${gearListVersionIds.$1.id}
+      ) as ${Tables.gearListItem}
+      on ${Tables.gearListItem}.${Columns.gearItemId} = ${Tables.gearItem}.${Columns.id}
+      left outer join (
+        select * from ${Tables.gearListItem}
+        where ${Tables.gearListItem}.${Columns.gearListVersionId} = ${gearListVersionIds.$2.id}
+      ) as $tableGearListItem2
+      on $tableGearListItem2.${Columns.gearItemId} = ${Tables.gearItem}.${Columns.id}
+      where ${Tables.gearItem}.${Columns.gearCategoryId} = ${gearCategoryId.id}
+      order by ${Tables.gearItem}.${Columns.sortIndex};
+      """,
+    );
+    return data
+        .map((joined) {
+          final gearListItem1 =
+              joined["${Tables.gearListItem}.${Columns.id}"] != null
+                  ? fromDbRecord(
+                      Map.fromEntries(
+                        joined.entries
+                            .where(
+                              (element) =>
+                                  element.key.startsWith(Tables.gearListItem),
+                            )
+                            .map(
+                              (e) => MapEntry(
+                                e.key.replaceFirst(
+                                  "${Tables.gearListItem}.",
+                                  "",
+                                ),
+                                e.value,
+                              ),
+                            ),
+                      ),
+                    )
+                  : null;
+          final gearListItem2 =
+              joined["$tableGearListItem2.${Columns.id}"] != null
+                  ? fromDbRecord(
+                      Map.fromEntries(
+                        joined.entries
+                            .where(
+                              (element) =>
+                                  element.key.startsWith(tableGearListItem2),
+                            )
+                            .map(
+                              (e) => MapEntry(
+                                e.key.replaceFirst("$tableGearListItem2.", ""),
+                                e.value,
+                              ),
+                            ),
+                      ),
+                    )
+                  : null;
+          final gearItem = GearItemAccessor().fromDbRecord(
+            Map.fromEntries(
+              joined.entries
+                  .where((element) => element.key.startsWith(Tables.gearItem))
+                  .map(
+                    (e) => MapEntry(
+                      e.key.replaceFirst("${Tables.gearItem}.", ""),
+                      e.value,
+                    ),
+                  ),
+            ),
+          );
+          return ((gearListItem1, gearListItem2), gearItem);
+        })
+        .where((item) => item.$1.$1 != null || item.$1.$2 != null)
+        .toList();
+  }
 }
 
 class GearItemAccessor extends TableAccessor<GearItemId, GearItem> {
