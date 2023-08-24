@@ -71,9 +71,6 @@ class _GearListDetails extends StatelessWidget {
                     child: Column(
                       children: [
                         Text(
-                          gearListVersion.name,
-                        ),
-                        Text(
                           gearCategory.name,
                           style: Theme.of(context).textTheme.headlineMedium,
                         ),
