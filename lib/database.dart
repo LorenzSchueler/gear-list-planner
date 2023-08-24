@@ -244,7 +244,8 @@ class GearListItemAccessor extends TableAccessor<GearListItemId, GearListItem> {
       inner join ${Tables.gearItem}
       on ${Tables.gearListItem}.${Columns.gearItemId} = ${Tables.gearItem}.${Columns.id}
       where ${Tables.gearListItem}.${Columns.gearListVersionId} = ${gearListVersionId.id}
-      and ${Tables.gearItem}.${Columns.gearCategoryId} = ${gearCategoryId.id};
+      and ${Tables.gearItem}.${Columns.gearCategoryId} = ${gearCategoryId.id}
+      order by ${Tables.gearItem}.${Columns.sortIndex};
       """,
     );
     return data.map((joined) {
@@ -304,6 +305,7 @@ class GearItemAccessor extends TableAccessor<GearItemId, GearItem> {
       tableName,
       where: "${Columns.gearCategoryId} = ?",
       whereArgs: [gearCategoryId.id],
+      orderBy: Columns.sortIndex,
     );
     return data.map(fromDbRecord).toList();
   }
