@@ -10,68 +10,65 @@ abstract final class AppDatabase {
       _databasePath,
       version: 1,
       onCreate: (db, version) async {
-        const integer = "integer not null";
-        const string = "text not null";
+        final gearListTable = Table(
+          Tables.gearList,
+          [
+            Column.idColumn(),
+            Column.stringColumn(Columns.name),
+          ],
+          [Columns.name],
+        );
 
-        String intColumn(String column) => "$column $integer";
-        String boolColumn(String column) =>
-            "${intColumn(column)} check($column in (0, 1))";
-        String fkColumn(String column, String table) =>
-            "${intColumn(column)} references $table on delete cascade";
-        String stringColumn(String column) => "$column $string";
+        final gearListVersionTable = Table(
+          Tables.gearListVersion,
+          [
+            Column.idColumn(),
+            Column.fkColumn(Columns.gearListId, Tables.gearList),
+            Column.stringColumn(Columns.name),
+            Column.stringColumn(Columns.notes),
+            Column.boolColumn(Columns.readOnly),
+          ],
+          [Columns.gearListId, Columns.name],
+        );
 
-        final idColumn = "${intColumn(Columns.id)} primary key autoincrement";
-        final nameColumn = stringColumn(Columns.name);
+        final gearListItemTable = Table(
+          Tables.gearListItem,
+          [
+            Column.idColumn(),
+            Column.fkColumn(Columns.gearItemId, Tables.gearItem),
+            Column.fkColumn(Columns.gearListVersionId, Tables.gearListVersion),
+            Column.intColumn(Columns.count),
+            Column.boolColumn(Columns.packed),
+          ],
+          [Columns.gearItemId, Columns.gearListVersionId],
+        );
 
-        String unique(List<String> columns) => "unique(${columns.join(', ')})";
+        final gearItemTable = Table(
+          Tables.gearItem,
+          [
+            Column.idColumn(),
+            Column.fkColumn(Columns.gearCategoryId, Tables.gearCategory),
+            Column.stringColumn(Columns.name),
+            Column.intColumn(Columns.weight),
+            Column.intColumn(Columns.sortIndex),
+          ],
+          [Columns.name],
+        );
 
-        String table(String table, List<String> columns) =>
-            "create table $table(\n${columns.join(',\n')}\n) strict;";
+        final gearCategoryTable = Table(
+          Tables.gearCategory,
+          [
+            Column.idColumn(),
+            Column.stringColumn(Columns.name),
+          ],
+          [Columns.name],
+        );
 
-        final gearListTable = table(Tables.gearList, [
-          idColumn,
-          nameColumn,
-          unique([Columns.name]),
-        ]);
-
-        final gearListVersionTable = table(Tables.gearListVersion, [
-          idColumn,
-          fkColumn(Columns.gearListId, Tables.gearList),
-          nameColumn,
-          stringColumn(Columns.notes),
-          boolColumn(Columns.readOnly),
-          unique([Columns.gearListId, Columns.name]),
-        ]);
-
-        final gearListItemTable = table(Tables.gearListItem, [
-          idColumn,
-          fkColumn(Columns.gearItemId, Tables.gearItem),
-          fkColumn(Columns.gearListVersionId, Tables.gearListVersion),
-          intColumn(Columns.count),
-          boolColumn(Columns.packed),
-          unique([Columns.gearItemId, Columns.gearListVersionId]),
-        ]);
-
-        final gearItemTable = table(Tables.gearItem, [
-          idColumn,
-          fkColumn(Columns.gearCategoryId, Tables.gearCategory),
-          nameColumn,
-          intColumn(Columns.weight),
-          intColumn(Columns.sortIndex),
-          unique([Columns.name]),
-        ]);
-
-        final gearCategoryTable = table(Tables.gearCategory, [
-          idColumn,
-          nameColumn,
-          unique([Columns.name]),
-        ]);
-
-        await db.execute(gearListTable);
-        await db.execute(gearListVersionTable);
-        await db.execute(gearCategoryTable);
-        await db.execute(gearItemTable);
-        await db.execute(gearListItemTable);
+        await db.execute(gearListTable.setupSql);
+        await db.execute(gearListVersionTable.setupSql);
+        await db.execute(gearCategoryTable.setupSql);
+        await db.execute(gearItemTable.setupSql);
+        await db.execute(gearListItemTable.setupSql);
       },
       onOpen: (db) async {
         await db.execute("pragma foreign_keys = on;");
@@ -108,4 +105,34 @@ abstract final class Columns {
   static const packed = "packed";
   static const readOnly = "read_only";
   static const weight = "weight";
+}
+
+class Table {
+  Table(this.name, this.columns, this.uniqueColumns);
+
+  String name;
+  List<Column> columns;
+  List<String> uniqueColumns;
+
+  String get setupSql => """
+    create table $name(
+      ${columns.map((c) => c.setupSql).join(',\n')},
+      unique(${uniqueColumns.join(', ')})
+    ) strict;""";
+}
+
+class Column {
+  Column.intColumn(String column) : setupSql = "$column $_integer";
+  Column.boolColumn(String column)
+      : setupSql = "$column $_integer check($column in (0, 1))";
+  Column.fkColumn(String column, String table)
+      : setupSql = "$column $_integer references $table on delete cascade";
+  Column.stringColumn(String column) : setupSql = "$column $_string";
+  Column.idColumn()
+      : setupSql = "${Columns.id} $_integer primary key autoincrement";
+
+  static const _integer = "integer not null";
+  static const _string = "text not null";
+
+  String setupSql;
 }
