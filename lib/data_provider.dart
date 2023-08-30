@@ -192,7 +192,7 @@ class ModelDataProvider extends ChangeNotifier {
     final result = await FilePicker.platform.pickFiles(withData: true);
     if (result != null) {
       final bytes = result.files.single.bytes!;
-      final data = String.fromCharCodes(bytes);
+      final data = utf8.decode(bytes);
       return data;
     }
     return null;
@@ -200,7 +200,11 @@ class ModelDataProvider extends ChangeNotifier {
 
   Future<void> _writeFile(String data, String filename) async {
     AnchorElement()
-      ..href = Uri.dataFromString(data, mimeType: "application/json").toString()
+      ..href = Uri.dataFromString(
+        data,
+        mimeType: "application/json",
+        encoding: Encoding.getByName("utf-8"),
+      ).toString()
       ..style.display = "none"
       ..download = filename
       ..click();
