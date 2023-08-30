@@ -21,6 +21,7 @@ GearListVersion _$GearListVersionFromJson(Map<String, dynamic> json) =>
       id: GearListVersionId(json['id'] as int),
       gearListId: GearListId(json['gear_list_id'] as int),
       name: json['name'] as String,
+      notes: json['notes'] as String,
       readOnly: json['read_only'] as bool,
     );
 
@@ -29,6 +30,7 @@ Map<String, dynamic> _$GearListVersionToJson(GearListVersion instance) =>
       'id': Id._toJson(instance.id),
       'gear_list_id': Id._toJson(instance.gearListId),
       'name': instance.name,
+      'notes': instance.notes,
       'read_only': instance.readOnly,
     };
 

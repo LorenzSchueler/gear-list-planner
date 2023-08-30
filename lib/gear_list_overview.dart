@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gear_list_planner/data_provider.dart';
+import 'package:gear_list_planner/database.dart';
 import 'package:gear_list_planner/dialog.dart';
 import 'package:gear_list_planner/model.dart';
 import 'package:provider/provider.dart';
@@ -85,34 +86,37 @@ class GearListOverview extends StatelessWidget {
                           );
                           if (newVersion != null) {
                             final (name, cloneVersionId) = newVersion;
+                            final Result<void> result;
                             if (cloneVersionId != null) {
-                              await dataProvider.gearListVersionDataProvider
+                              result = await dataProvider
+                                  .gearListVersionDataProvider
                                   .cloneVersion(
                                 name,
                                 gearList.id,
                                 cloneVersionId,
                               );
                             } else {
-                              final result = await dataProvider
+                              result = await dataProvider
                                   .gearListVersionDataProvider
                                   .create(
                                 GearListVersion(
                                   id: GearListVersionId(0),
                                   gearListId: gearList.id,
                                   name: name,
+                                  notes: "",
                                   readOnly: false,
                                 ),
                                 autoId: true,
                               );
-                              if (result.isError && context.mounted) {
-                                await showMessageDialog(
-                                  context,
-                                  "An Error Occurred",
-                                  result.error!.isUniqueViolation
-                                      ? "A version with the same name already exists."
-                                      : result.errorMessage!,
-                                );
-                              }
+                            }
+                            if (result.isError && context.mounted) {
+                              await showMessageDialog(
+                                context,
+                                "An Error Occurred",
+                                result.error!.isUniqueViolation
+                                    ? "A version with the same name already exists."
+                                    : result.errorMessage!,
+                              );
                             }
                           }
                         },

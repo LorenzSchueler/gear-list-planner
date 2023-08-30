@@ -78,20 +78,25 @@ class GearListVersionDataProvider
   Future<List<GearListVersion>> getByGearListId(GearListId gearListId) =>
       tableAccessor.getByGearListId(gearListId);
 
-  Future<void> cloneVersion(
+  Future<Result<void>> cloneVersion(
     String name,
     GearListId gearListId,
     GearListVersionId cloneId,
   ) async {
-    final id = await create(
+    final result = await create(
       GearListVersion(
         id: GearListVersionId(0),
         gearListId: gearListId,
         name: name,
+        notes: "",
         readOnly: false,
       ),
       autoId: true,
     );
+    if (result.isError) {
+      return result;
+    }
+    final id = result.success;
     await TableAccessor.database.execute(
       """
       insert into ${Tables.gearListItem}(${Columns.gearItemId}, ${Columns.gearListVersionId}, ${Columns.count}, ${Columns.packed}) 
@@ -100,6 +105,7 @@ class GearListVersionDataProvider
       where ${Columns.gearListVersionId} = ${cloneId.id};
       """,
     );
+    return Result.success(null);
   }
 }
 

@@ -78,6 +78,7 @@ class GearListVersion extends Entity<GearListVersionId> {
     required this.id,
     required this.gearListId,
     required this.name,
+    required this.notes,
     required this.readOnly,
   });
 
@@ -93,6 +94,7 @@ class GearListVersion extends Entity<GearListVersionId> {
   @JsonKey(fromJson: GearListId.new, toJson: Id._toJson)
   GearListId gearListId;
   String name;
+  String notes;
   bool readOnly;
 
   @override

@@ -226,66 +226,86 @@ class _GearListDetails extends StatelessWidget {
               child: Padding(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Checkbox(
-                          value: gearListVersion.readOnly,
-                          onChanged: (readOnly) async {
-                            if (readOnly != null) {
-                              final result = await dataProvider
-                                  .gearListVersionDataProvider
-                                  .update(gearListVersion..readOnly = readOnly);
-                              if (result.isError && context.mounted) {
-                                await showMessageDialog(
-                                  context,
-                                  "An Error Occurred",
-                                  result.errorMessage!,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 400),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Checkbox(
+                            value: gearListVersion.readOnly,
+                            onChanged: (readOnly) async {
+                              if (readOnly != null) {
+                                final result = await dataProvider
+                                    .gearListVersionDataProvider
+                                    .update(
+                                  gearListVersion..readOnly = readOnly,
                                 );
+                                if (result.isError && context.mounted) {
+                                  await showMessageDialog(
+                                    context,
+                                    "An Error Occurred",
+                                    result.errorMessage!,
+                                  );
+                                }
                               }
+                            },
+                          ),
+                          const Text("Read Only"),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Checkbox(
+                            value: unpackedOnly.isOn,
+                            onChanged: unpackedOnly.setState,
+                          ),
+                          const Text("Show Unpacked Only"),
+                        ],
+                      ),
+                      if (!gearListVersion.readOnly)
+                        FilledButton(
+                          onPressed: () async {
+                            final mark = await showWarningDialog(
+                              context,
+                              "Mark All As Unpacked?",
+                              null,
+                              "Set As Unpacked",
+                            );
+                            if (mark) {
+                              await dataProvider.gearListItemDataProvider
+                                  .updateMultiple(
+                                categoriesWithItems.listItems
+                                    .map((e) => e..packed = false)
+                                    .toList(),
+                              );
                             }
                           },
+                          child: const Text("Mark All As Unpacked"),
                         ),
-                        const Text("Read Only"),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Checkbox(
-                          value: unpackedOnly.isOn,
-                          onChanged: unpackedOnly.setState,
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          child: TextFormField(
+                            initialValue: gearListVersion.notes,
+                            onChanged: (value) {
+                              dataProvider.gearListVersionDataProvider
+                                  .update(gearListVersion..notes = value);
+                            },
+                            maxLines: null,
+                            decoration: const InputDecoration.collapsed(
+                              hintText: "Notes",
+                            ),
+                          ),
                         ),
-                        const Text("Show Unpacked Only"),
-                      ],
-                    ),
-                    if (!gearListVersion.readOnly)
-                      FilledButton(
-                        onPressed: () async {
-                          final mark = await showWarningDialog(
-                            context,
-                            "Mark All As Unpacked?",
-                            null,
-                            "Set As Unpacked",
-                          );
-                          if (mark) {
-                            await dataProvider.gearListItemDataProvider
-                                .updateMultiple(
-                              categoriesWithItems.listItems
-                                  .map((e) => e..packed = false)
-                                  .toList(),
-                            );
-                          }
-                        },
-                        child: const Text("Mark All As Unpacked"),
                       ),
-                    const Spacer(),
-                    Text(
-                      "Total: ${(categoriesWithItems.weight / 1000).toStringAsFixed(3)} kg",
-                      style: Theme.of(context).textTheme.headlineMedium,
-                    ),
-                  ],
+                      Text(
+                        "Total: ${(categoriesWithItems.weight / 1000).toStringAsFixed(3)} kg",
+                        style: Theme.of(context).textTheme.headlineMedium,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

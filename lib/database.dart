@@ -39,6 +39,7 @@ abstract final class AppDatabase {
           idColumn,
           fkColumn(Columns.gearListId, Tables.gearList),
           nameColumn,
+          stringColumn(Columns.notes),
           boolColumn(Columns.readOnly),
           unique([Columns.gearListId, Columns.name]),
         ]);
@@ -104,6 +105,7 @@ abstract final class Columns {
   static const gearItemId = "gear_item_id";
   static const gearCategoryId = "gear_category_id";
   static const name = "name";
+  static const notes = "notes";
   static const packed = "packed";
   static const readOnly = "read_only";
   static const weight = "weight";
