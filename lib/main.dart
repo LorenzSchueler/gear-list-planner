@@ -4,6 +4,7 @@ import 'dart:html' as html;
 import 'package:flutter/material.dart';
 import 'package:gear_list_planner/data_provider.dart';
 import 'package:gear_list_planner/database.dart';
+import 'package:gear_list_planner/dialog.dart';
 import 'package:gear_list_planner/gear_item_overview.dart';
 import 'package:gear_list_planner/gear_list_compare.dart';
 import 'package:gear_list_planner/gear_list_details.dart';
@@ -141,7 +142,16 @@ class _AppState extends State<App> with TickerProviderStateMixin {
             const Text("Gear List Planner"),
             const Spacer(),
             FilledButton.icon(
-              onPressed: () => ModelDataProvider().loadModel(),
+              onPressed: () async {
+                final result = await ModelDataProvider().loadModel();
+                if (result.isError && mounted) {
+                  await showMessageDialog(
+                    context,
+                    "Invalid Data",
+                    result.errorMessage!,
+                  );
+                }
+              },
               icon: const Icon(Icons.upload_file_rounded),
               label: const Text("Open"),
             ),

@@ -128,8 +128,13 @@ class Result<T> {
     }
   }
 
+  /// not null if success
   final T? success;
+
+  /// not null if error
   final ErrorType? error;
+
+  /// not null if error
   final String? errorMessage;
 
   bool get isSuccess => success != null;
@@ -138,9 +143,11 @@ class Result<T> {
 
 enum ErrorType {
   uniqueConstraint,
+  invalidJson,
   unknown;
 
   bool get isUniqueViolation => this == ErrorType.uniqueConstraint;
+  bool get isInvalidJson => this == ErrorType.invalidJson;
 }
 
 abstract class TableAccessor<I extends Id, E extends Entity<I>> {

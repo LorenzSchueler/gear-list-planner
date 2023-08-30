@@ -257,16 +257,22 @@ class ModelDataProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> loadModel() async {
+  Future<Result<void>> loadModel() async {
     await AppDatabase.clearDatabase();
     final data = await _readFile();
     if (data == null) {
-      return;
+      return Result.success(null);
     }
 
-    final model = GearModel.fromJson(jsonDecode(data) as Map<String, dynamic>);
+    final GearModel model;
+    try {
+      model = GearModel.fromJson(jsonDecode(data) as Map<String, dynamic>);
+    } on TypeError catch (e) {
+      return Result.error(ErrorType.invalidJson, e.toString());
+    }
     await _createModel(model);
     notifyListeners();
+    return Result.success(null);
   }
 
   Future<void> storeModel() async {
