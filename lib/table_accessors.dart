@@ -132,6 +132,7 @@ class GearListItemAccessor extends TableAccessor<GearListItemId, GearListItem> {
         ${_fullyQualifiedNames(Tables.gearItem, [
             Columns.id,
             Columns.gearCategoryId,
+            Columns.type,
             Columns.name,
             Columns.weight,
             Columns.sortIndex,
@@ -199,6 +200,7 @@ class GearListItemAccessor extends TableAccessor<GearListItemId, GearListItem> {
         ${_fullyQualifiedNames(Tables.gearItem, [
             Columns.id,
             Columns.gearCategoryId,
+            Columns.type,
             Columns.name,
             Columns.weight,
             Columns.sortIndex,

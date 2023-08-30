@@ -49,6 +49,7 @@ abstract final class AppDatabase {
             Column.idColumn(),
             Column.fkColumn(Columns.gearCategoryId, Tables.gearCategory),
             Column.stringColumn(Columns.name),
+            Column.stringColumn(Columns.type),
             Column.intColumn(Columns.weight),
             Column.intColumn(Columns.sortIndex),
           ],
@@ -104,6 +105,7 @@ abstract final class Columns {
   static const notes = "notes";
   static const packed = "packed";
   static const readOnly = "read_only";
+  static const type = "type";
   static const weight = "weight";
 }
 

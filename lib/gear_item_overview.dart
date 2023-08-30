@@ -71,13 +71,14 @@ class GearItemOverview extends StatelessWidget {
                         ],
                       ),
                       _ItemInput(
-                        onAdd: (name, weight) async {
+                        onAdd: (type, name, weight) async {
                           final result =
                               await dataProvider.gearItemDataProvider.create(
                             GearItem(
                               id: GearItemId(0),
                               gearCategoryId: gearCategory.id,
                               name: name,
+                              type: type,
                               weight: weight,
                               sortIndex: 0,
                             ),
@@ -109,9 +110,17 @@ class GearItemOverview extends StatelessWidget {
                                   child: const Icon(Icons.drag_handle_rounded),
                                 ),
                                 const SizedBox(width: 10),
-                                Text(
-                                  gearItem.name,
-                                  style: Theme.of(context).textTheme.titleLarge,
+                                Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      gearItem.type,
+                                      style:
+                                          Theme.of(context).textTheme.bodyLarge,
+                                    ),
+                                    Text(gearItem.name),
+                                  ],
                                 ),
                                 const Spacer(),
                                 Text(
@@ -120,18 +129,21 @@ class GearItemOverview extends StatelessWidget {
                                 ),
                                 IconButton(
                                   onPressed: () async {
-                                    final nameWeight =
-                                        await showNameWeightDialog(
+                                    final typeNameWeight =
+                                        await showTypeNameWeightDialog(
                                       context,
+                                      gearItem.type,
                                       gearItem.name,
                                       gearItem.weight,
                                     );
-                                    if (nameWeight != null) {
-                                      final (name, weight) = nameWeight;
+                                    if (typeNameWeight != null) {
+                                      final (type, name, weight) =
+                                          typeNameWeight;
                                       final result = await dataProvider
                                           .gearItemDataProvider
                                           .update(
                                         gearItem
+                                          ..type = type
                                           ..name = name
                                           ..weight = weight,
                                       );
@@ -222,7 +234,7 @@ class GearItemOverview extends StatelessWidget {
 class _ItemInput extends StatefulWidget {
   const _ItemInput({required this.onAdd});
 
-  final void Function(String, int) onAdd;
+  final void Function(String, String, int) onAdd;
 
   @override
   State<_ItemInput> createState() => _ItemInputState();
@@ -231,8 +243,10 @@ class _ItemInput extends StatefulWidget {
 class _ItemInputState extends State<_ItemInput> {
   final _formKey = GlobalKey<FormState>();
 
+  final typeController = TextEditingController();
   final nameController = TextEditingController();
   final weightController = TextEditingController();
+  String _type = "";
   String _name = "";
   int _weight = 0;
 
@@ -242,6 +256,20 @@ class _ItemInputState extends State<_ItemInput> {
       key: _formKey,
       child: Row(
         children: [
+          Expanded(
+            child: TextFormField(
+              controller: typeController,
+              decoration: const InputDecoration(labelText: "Type"),
+              onChanged: (type) => setState(() => _type = type),
+              validator: (type) {
+                if (type == null || type.isEmpty) {
+                  return 'please enter a type';
+                }
+                return null;
+              },
+            ),
+          ),
+          const SizedBox(width: 10),
           Expanded(
             child: TextFormField(
               controller: nameController,
@@ -280,7 +308,7 @@ class _ItemInputState extends State<_ItemInput> {
           IconButton(
             onPressed: () {
               if (_formKey.currentState?.validate() ?? false) {
-                widget.onAdd(_name, _weight);
+                widget.onAdd(_type, _name, _weight);
                 nameController.text = "";
                 weightController.text = "";
               }

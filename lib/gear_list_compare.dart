@@ -82,10 +82,19 @@ class _GearListCompare extends StatelessWidget {
                                         Theme.of(context).textTheme.titleLarge,
                                   ),
                                   const SizedBox(width: 10),
-                                  Text(
-                                    gearItem.name,
-                                    style:
-                                        Theme.of(context).textTheme.titleLarge,
+                                  Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        gearItem.type,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyLarge,
+                                      ),
+                                      Text(gearItem.name),
+                                    ],
                                   ),
                                   const Spacer(),
                                   Text(

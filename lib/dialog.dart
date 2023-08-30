@@ -70,23 +70,22 @@ Future<String?> showNameDialog(
 ) {
   return showDialog<String>(
     context: context,
-    builder: (_) => NameDialog(initialName: initialName),
+    builder: (_) => _NameDialog(initialName: initialName),
   );
 }
 
-class NameDialog extends StatefulWidget {
-  const NameDialog({
-    super.key,
+class _NameDialog extends StatefulWidget {
+  const _NameDialog({
     required this.initialName,
   });
 
   final String? initialName;
 
   @override
-  State<NameDialog> createState() => _NameDialogState();
+  State<_NameDialog> createState() => _NameDialogState();
 }
 
-class _NameDialogState extends State<NameDialog> {
+class _NameDialogState extends State<_NameDialog> {
   final _formKey = GlobalKey<FormState>();
 
   late String _name = widget.initialName ?? "";
@@ -132,37 +131,41 @@ class _NameDialogState extends State<NameDialog> {
   }
 }
 
-Future<(String, int)?> showNameWeightDialog(
+Future<(String, String, int)?> showTypeNameWeightDialog(
   BuildContext context,
+  String initialType,
   String initialName,
   int initialWeight,
 ) {
-  return showDialog<(String, int)>(
+  return showDialog<(String, String, int)>(
     context: context,
-    builder: (_) => NameWeightDialog(
+    builder: (_) => _TypeNameWeightDialog(
+      initialType: initialType,
       initialName: initialName,
       initialWeight: initialWeight,
     ),
   );
 }
 
-class NameWeightDialog extends StatefulWidget {
-  const NameWeightDialog({
-    super.key,
+class _TypeNameWeightDialog extends StatefulWidget {
+  const _TypeNameWeightDialog({
+    required this.initialType,
     required this.initialName,
     required this.initialWeight,
   });
 
+  final String initialType;
   final String initialName;
   final int initialWeight;
 
   @override
-  State<NameWeightDialog> createState() => _NameWeightDialogState();
+  State<_TypeNameWeightDialog> createState() => _TypeNameWeightDialogState();
 }
 
-class _NameWeightDialogState extends State<NameWeightDialog> {
+class _TypeNameWeightDialogState extends State<_TypeNameWeightDialog> {
   final _formKey = GlobalKey<FormState>();
 
+  late String _type = widget.initialType;
   late String _name = widget.initialName;
   late int _weight = widget.initialWeight;
 
@@ -174,6 +177,18 @@ class _NameWeightDialogState extends State<NameWeightDialog> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            TextFormField(
+              initialValue: widget.initialType,
+              decoration: const InputDecoration(labelText: "Type"),
+              autofocus: true,
+              onChanged: (type) => setState(() => _type = type),
+              validator: (type) {
+                if (type == null || type.isEmpty) {
+                  return 'please enter a type';
+                }
+                return null;
+              },
+            ),
             TextFormField(
               initialValue: widget.initialName,
               decoration: const InputDecoration(labelText: "Name"),
@@ -214,7 +229,7 @@ class _NameWeightDialogState extends State<NameWeightDialog> {
           ),
           TextButton(
             onPressed: _formKey.currentState?.validate() ?? false
-                ? () => Navigator.of(context).pop((_name, _weight))
+                ? () => Navigator.of(context).pop((_type, _name, _weight))
                 : null,
             child: const Text("Update"),
           ),
@@ -230,22 +245,22 @@ Future<(String, GearListVersionId?)?> showCloneVersionDialog(
 ) {
   return showDialog<(String, GearListVersionId?)>(
     context: context,
-    builder: (_) => CloneVersionDialog(
+    builder: (_) => _CloneVersionDialog(
       versions: versions,
     ),
   );
 }
 
-class CloneVersionDialog extends StatefulWidget {
-  const CloneVersionDialog({super.key, required this.versions});
+class _CloneVersionDialog extends StatefulWidget {
+  const _CloneVersionDialog({required this.versions});
 
   final List<GearListVersion> versions;
 
   @override
-  State<CloneVersionDialog> createState() => _CloneVersionDialogState();
+  State<_CloneVersionDialog> createState() => _CloneVersionDialogState();
 }
 
-class _CloneVersionDialogState extends State<CloneVersionDialog> {
+class _CloneVersionDialogState extends State<_CloneVersionDialog> {
   final _formKey = GlobalKey<FormState>();
 
   String _name = "";
