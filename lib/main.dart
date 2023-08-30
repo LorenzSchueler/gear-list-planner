@@ -85,30 +85,20 @@ class App extends StatefulWidget {
   State<App> createState() => _AppState();
 }
 
+enum Tab { listOverview, itemOverview, listDetails, listCompare }
+
 class _AppState extends State<App> with TickerProviderStateMixin {
-  void _updateTabController(bool addDetails) {
-    final currentIndex = _tabController.index;
-    final oldLength = _tabController.length;
-    final length =
-        2 + (_gearList != null ? 1 : 0) + (_gearListCompare.$2 != null ? 1 : 0);
-    _tabController.dispose();
-    _tabController = TabController(
-      length: length,
-      initialIndex: addDetails
-          ? 2
-          : oldLength == length
-              ? currentIndex
-              : oldLength > length
-                  ? 0
-                  : length - 1,
-      vsync: this,
-    );
-  }
+  Tab _navigationTab = Tab.listOverview;
+
+  bool get showDetails => _gearList != null;
+  bool get showCompare => _gearListCompare.$2 != null;
 
   GearList? _gearList;
   void _setGearList(GearList? gearList) {
-    setState(() => _gearList = gearList);
-    _updateTabController(true);
+    setState(() {
+      _gearList = gearList;
+      _navigationTab = gearList != null ? Tab.listDetails : Tab.listOverview;
+    });
   }
 
   (GearList?, GearList?) _gearListCompare = (null, null);
@@ -124,11 +114,12 @@ class _AppState extends State<App> with TickerProviderStateMixin {
     } else {
       gearListCompare = (_gearListCompare.$1, gearList);
     }
-    setState(() => _gearListCompare = gearListCompare);
-    _updateTabController(false);
+    setState(() {
+      _gearListCompare = gearListCompare;
+      _navigationTab =
+          gearListCompare.$2 != null ? Tab.listCompare : Tab.listOverview;
+    });
   }
-
-  late TabController _tabController = TabController(length: 2, vsync: this);
 
   @override
   Widget build(BuildContext context) {
@@ -164,50 +155,62 @@ class _AppState extends State<App> with TickerProviderStateMixin {
             ),
           ],
         ),
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: <Widget>[
-            const Tab(
-              text: "Lists",
-              icon: Icon(Icons.list_alt_rounded),
+        bottom: PreferredSize(
+          preferredSize: const Size(double.infinity, 65),
+          child: NavigationBar(
+            selectedIndex: _navigationTab.index,
+            onDestinationSelected: (index) => setState(
+              () => _navigationTab = Tab.values[index],
             ),
-            const Tab(
-              text: "Items",
-              icon: Icon(Icons.business_center_rounded),
-            ),
-            if (_gearList != null)
-              Tab(
-                text: _gearList!.name,
+            destinations: <Widget>[
+              const NavigationDestination(
+                label: "Lists",
+                icon: Icon(Icons.list_alt_rounded),
+              ),
+              const NavigationDestination(
+                label: "Items",
+                icon: Icon(Icons.business_center_rounded),
+              ),
+              NavigationDestination(
+                label: showDetails ? _gearList!.name : "Details",
                 icon: const Icon(Icons.check_box_rounded),
               ),
-            if (_gearListCompare.$2 != null)
-              Tab(
-                text:
-                    "${_gearListCompare.$1!.name} - ${_gearListCompare.$2!.name}",
-                icon: const Icon(Icons.check_box_rounded),
+              NavigationDestination(
+                label: showCompare
+                    ? "${_gearListCompare.$1!.name} - ${_gearListCompare.$2!.name}"
+                    : "Compare",
+                icon: const Icon(Icons.compare_rounded),
               ),
-          ],
+            ],
+          ),
         ),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          GearListOverview(
+      body: switch (_navigationTab) {
+        Tab.listOverview => GearListOverview(
             onSelectGearList: _setGearList,
             onToggleCompareGearList: _toggleCompareGearList,
             selectedCompare: _gearListCompare,
           ),
-          const GearItemOverview(),
-          if (_gearList != null)
-            GearListDetailsLoadWrapper(
-              gearListId: _gearList!.id,
-            ),
-          if (_gearListCompare.$2 != null)
-            GearListCompareLoadWrapper(
-              gearListIds: (_gearListCompare.$1!.id, _gearListCompare.$2!.id),
-            ),
-        ],
-      ),
+        Tab.itemOverview => const GearItemOverview(),
+        Tab.listDetails => showDetails
+            ? GearListDetailsLoadWrapper(
+                gearListId: _gearList!.id,
+              )
+            : const Center(
+                child: Text(
+                  "No list selected. Select a list in the list overview.",
+                ),
+              ),
+        Tab.listCompare => showCompare
+            ? GearListCompareLoadWrapper(
+                gearListIds: (_gearListCompare.$1!.id, _gearListCompare.$2!.id),
+              )
+            : const Center(
+                child: Text(
+                  "No lists selected for comparison. Select two lists in the list overview.",
+                ),
+              ),
+      },
     );
   }
 }
