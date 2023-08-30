@@ -74,7 +74,7 @@ class _GearListDetails extends StatelessWidget {
                           gearCategory.name,
                           style: Theme.of(context).textTheme.titleLarge,
                         ),
-                        if (!gearListVersion.readOnly)
+                        if (!gearListVersion.readOnly) ...[
                           _ListItemInput(
                             onAdd: (gearItemId) async {
                               final result = await dataProvider
@@ -102,7 +102,8 @@ class _GearListDetails extends StatelessWidget {
                             gearItems:
                                 dataProvider.gearItems[gearCategory.id] ?? [],
                           ),
-                        const SizedBox(height: 20),
+                          const SizedBox(height: 20),
+                        ],
                         Expanded(
                           child: ListView.builder(
                             itemCount: filteredGearListItemsAndItems.length,

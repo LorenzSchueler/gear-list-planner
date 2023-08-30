@@ -6,20 +6,9 @@ part of 'model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-GearList _$GearListFromJson(Map<String, dynamic> json) => GearList(
-      id: GearListId(json['id'] as int),
-      name: json['name'] as String,
-    );
-
-Map<String, dynamic> _$GearListToJson(GearList instance) => <String, dynamic>{
-      'id': Id._toJson(instance.id),
-      'name': instance.name,
-    };
-
 GearListVersion _$GearListVersionFromJson(Map<String, dynamic> json) =>
     GearListVersion(
       id: GearListVersionId(json['id'] as int),
-      gearListId: GearListId(json['gear_list_id'] as int),
       name: json['name'] as String,
       notes: json['notes'] as String,
       readOnly: json['read_only'] as bool,
@@ -28,7 +17,6 @@ GearListVersion _$GearListVersionFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$GearListVersionToJson(GearListVersion instance) =>
     <String, dynamic>{
       'id': Id._toJson(instance.id),
-      'gear_list_id': Id._toJson(instance.gearListId),
       'name': instance.name,
       'notes': instance.notes,
       'read_only': instance.readOnly,
@@ -81,9 +69,6 @@ Map<String, dynamic> _$GearCategoryToJson(GearCategory instance) =>
     };
 
 GearModel _$GearModelFromJson(Map<String, dynamic> json) => GearModel(
-      gearLists: (json['gear_lists'] as List<dynamic>)
-          .map((e) => GearList.fromJson(e as Map<String, dynamic>))
-          .toList(),
       gearListVersions: (json['gear_list_versions'] as List<dynamic>)
           .map((e) => GearListVersion.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -99,7 +84,6 @@ GearModel _$GearModelFromJson(Map<String, dynamic> json) => GearModel(
     );
 
 Map<String, dynamic> _$GearModelToJson(GearModel instance) => <String, dynamic>{
-      'gear_lists': instance.gearLists,
       'gear_list_versions': instance.gearListVersions,
       'gear_list_items': instance.gearListItems,
       'gear_items': instance.gearItems,

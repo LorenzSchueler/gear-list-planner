@@ -59,15 +59,6 @@ abstract class TableAccessor<I extends Id, E extends Entity<I>> {
   }
 }
 
-class GearListAccessor extends TableAccessor<GearListId, GearList> {
-  @override
-  GearList fromDbRecord(Map<String, dynamic> dbRecord) =>
-      GearList.fromJson(dbRecord);
-
-  @override
-  String tableName = Tables.gearList;
-}
-
 class GearListVersionAccessor
     extends TableAccessor<GearListVersionId, GearListVersion> {
   @override
@@ -86,15 +77,6 @@ class GearListVersionAccessor
 
   @override
   String tableName = Tables.gearListVersion;
-
-  Future<List<GearListVersion>> getByGearListId(GearListId gearListId) async {
-    final data = await TableAccessor.database.query(
-      tableName,
-      where: "${Columns.gearListId} = ?",
-      whereArgs: [gearListId.id],
-    );
-    return data.map(fromDbRecord).toList();
-  }
 }
 
 class GearListItemAccessor extends TableAccessor<GearListItemId, GearListItem> {

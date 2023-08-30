@@ -55,17 +55,6 @@ abstract class EntityDataProvider<I extends Id, E extends Entity<I>>
   Future<List<E>> getAll() => tableAccessor.getAll();
 }
 
-class GearListDataProvider extends EntityDataProvider<GearListId, GearList> {
-  factory GearListDataProvider() => _instance;
-
-  GearListDataProvider._();
-
-  static final _instance = GearListDataProvider._();
-
-  @override
-  final tableAccessor = GearListAccessor();
-}
-
 class GearListVersionDataProvider
     extends EntityDataProvider<GearListVersionId, GearListVersion> {
   factory GearListVersionDataProvider() => _instance;
@@ -77,18 +66,13 @@ class GearListVersionDataProvider
   @override
   final GearListVersionAccessor tableAccessor = GearListVersionAccessor();
 
-  Future<List<GearListVersion>> getByGearListId(GearListId gearListId) =>
-      tableAccessor.getByGearListId(gearListId);
-
   Future<Result<void>> cloneVersion(
     String name,
-    GearListId gearListId,
     GearListVersionId cloneId,
   ) async {
     final result = await create(
       GearListVersion(
         id: GearListVersionId(0),
-        gearListId: gearListId,
         name: name,
         notes: "",
         readOnly: false,
@@ -187,7 +171,6 @@ class ModelDataProvider extends ChangeNotifier {
   factory ModelDataProvider() {
     if (_instance == null) {
       final instance = ModelDataProvider._();
-      instance._gearListDataProvider.addListener(instance.notifyListeners);
       instance._gearListVersionDataProvider
           .addListener(instance.notifyListeners);
       instance._gearListItemDataProvider.addListener(instance.notifyListeners);
@@ -202,7 +185,6 @@ class ModelDataProvider extends ChangeNotifier {
 
   static ModelDataProvider? _instance;
 
-  final _gearListDataProvider = GearListDataProvider();
   final _gearListVersionDataProvider = GearListVersionDataProvider();
   final _gearListItemDataProvider = GearListItemDataProvider();
   final _gearItemDataProvider = GearItemDataProvider();
@@ -227,13 +209,6 @@ class ModelDataProvider extends ChangeNotifier {
   }
 
   Future<void> _createModel(GearModel model) async {
-    for (final gearList in model.gearLists) {
-      await _gearListDataProvider.create(
-        gearList,
-        autoId: false,
-        notify: false,
-      );
-    }
     for (final gearListVersion in model.gearListVersions) {
       await _gearListVersionDataProvider.create(
         gearListVersion,
@@ -285,7 +260,6 @@ class ModelDataProvider extends ChangeNotifier {
 
   Future<void> storeModel() async {
     final model = GearModel(
-      gearLists: await _gearListDataProvider.getAll(),
       gearListVersions: await _gearListVersionDataProvider.getAll(),
       gearListItems: await _gearListItemDataProvider.getAll(),
       gearItems: await _gearItemDataProvider.getAll(),
@@ -312,30 +286,16 @@ class GearListOverviewDataProvider extends ChangeNotifier {
   static GearListOverviewDataProvider? _instance;
 
   final _dataProvider = ModelDataProvider();
-  GearListDataProvider get gearListDataProvider =>
-      _dataProvider._gearListDataProvider;
   GearListVersionDataProvider get gearListVersionDataProvider =>
       _dataProvider._gearListVersionDataProvider;
 
-  List<(GearList, List<GearListVersion>)> _gearListsWithVersions = [];
-  List<(GearList, List<GearListVersion>)> get gearListsWithVersions =>
-      _gearListsWithVersions;
+  List<GearListVersion> _gearListVersions = [];
+  List<GearListVersion> get gearListVersions => _gearListVersions;
 
   void setState() => notifyListeners();
 
   Future<void> _onUpdate() async {
-    final gearLists = await _dataProvider._gearListDataProvider.getAll();
-    final gearListsWithVersions = <(GearList, List<GearListVersion>)>[];
-    for (final gearList in gearLists) {
-      gearListsWithVersions.add(
-        (
-          gearList,
-          await _dataProvider._gearListVersionDataProvider
-              .getByGearListId(gearList.id)
-        ),
-      );
-    }
-    _gearListsWithVersions = gearListsWithVersions;
+    _gearListVersions = await gearListVersionDataProvider.getAll();
     notifyListeners();
   }
 }

@@ -10,25 +10,15 @@ abstract final class AppDatabase {
       _databasePath,
       version: 1,
       onCreate: (db, version) async {
-        final gearListTable = Table(
-          Tables.gearList,
-          [
-            Column.idColumn(),
-            Column.stringColumn(Columns.name),
-          ],
-          [Columns.name],
-        );
-
         final gearListVersionTable = Table(
           Tables.gearListVersion,
           [
             Column.idColumn(),
-            Column.fkColumn(Columns.gearListId, Tables.gearList),
             Column.stringColumn(Columns.name),
             Column.stringColumn(Columns.notes),
             Column.boolColumn(Columns.readOnly),
           ],
-          [Columns.gearListId, Columns.name],
+          [Columns.name],
         );
 
         final gearListItemTable = Table(
@@ -65,7 +55,6 @@ abstract final class AppDatabase {
           [Columns.name],
         );
 
-        await db.execute(gearListTable.setupSql);
         await db.execute(gearListVersionTable.setupSql);
         await db.execute(gearCategoryTable.setupSql);
         await db.execute(gearItemTable.setupSql);
@@ -78,14 +67,13 @@ abstract final class AppDatabase {
   }
 
   static Future<void> clearDatabase() async {
-    await database.delete(Tables.gearList, where: "1=?", whereArgs: [1]);
-    await database.delete(Tables.gearCategory, where: "1=?", whereArgs: [1]);
+    await database.delete(Tables.gearListVersion);
+    await database.delete(Tables.gearCategory);
     // other tables deleted by cascading delete
   }
 }
 
 abstract final class Tables {
-  static const gearList = "gear_list";
   static const gearListVersion = "gear_list_version";
   static const gearListItem = "gear_list_item";
   static const gearItem = "gear_item";
@@ -96,7 +84,6 @@ abstract final class Columns {
   static const count = "count";
   static const id = "id";
   static const sortIndex = "sort_index";
-  static const gearListId = "gear_list_id";
   static const gearListVersionId = "gear_list_version_id";
   static const gearListItemId = "gear_list_item_id";
   static const gearItemId = "gear_item_id";
