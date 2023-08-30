@@ -7,23 +7,22 @@ import 'package:provider/provider.dart';
 class GearListCompareLoadWrapper extends StatelessWidget {
   const GearListCompareLoadWrapper({
     super.key,
-    required this.gearListVersionIds,
+    required this.gearListIds,
   });
 
-  final (GearListVersionId, GearListVersionId) gearListVersionIds;
+  final (GearListId, GearListId) gearListIds;
 
   @override
   Widget build(BuildContext context) {
     return Consumer<GearListCompareDataProvider>(
       builder: (context, dataProvider, _) {
-        final gearItemsForListVersions =
-            dataProvider.gearItemsForListVersion(gearListVersionIds);
-        return gearItemsForListVersions == null
+        final gearItemsForLists = dataProvider.gearItemsForList(gearListIds);
+        return gearItemsForLists == null
             ? const Center(child: CircularProgressIndicator())
             : _GearListCompare(
                 dataProvider: dataProvider,
-                gearListVersions: gearItemsForListVersions.$1,
-                categoriesWithItems: gearItemsForListVersions.$2,
+                gearLists: gearItemsForLists.$1,
+                categoriesWithItems: gearItemsForLists.$2,
               );
       },
     );
@@ -33,12 +32,12 @@ class GearListCompareLoadWrapper extends StatelessWidget {
 class _GearListCompare extends StatelessWidget {
   const _GearListCompare({
     required this.dataProvider,
-    required this.gearListVersions,
+    required this.gearLists,
     required this.categoriesWithItems,
   });
 
   final GearListCompareDataProvider dataProvider;
-  final (GearListVersion, GearListVersion) gearListVersions;
+  final (GearList, GearList) gearLists;
   final List<(GearCategory, List<((GearListItem?, GearListItem?), GearItem)>)>
       categoriesWithItems;
 

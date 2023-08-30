@@ -55,24 +55,23 @@ abstract class EntityDataProvider<I extends Id, E extends Entity<I>>
   Future<List<E>> getAll() => tableAccessor.getAll();
 }
 
-class GearListVersionDataProvider
-    extends EntityDataProvider<GearListVersionId, GearListVersion> {
-  factory GearListVersionDataProvider() => _instance;
+class GearListDataProvider extends EntityDataProvider<GearListId, GearList> {
+  factory GearListDataProvider() => _instance;
 
-  GearListVersionDataProvider._();
+  GearListDataProvider._();
 
-  static final _instance = GearListVersionDataProvider._();
+  static final _instance = GearListDataProvider._();
 
   @override
-  final GearListVersionAccessor tableAccessor = GearListVersionAccessor();
+  final GearListAccessor tableAccessor = GearListAccessor();
 
-  Future<Result<void>> cloneVersion(
+  Future<Result<void>> cloneList(
     String name,
-    GearListVersionId cloneId,
+    GearListId cloneId,
   ) async {
     final result = await create(
-      GearListVersion(
-        id: GearListVersionId(0),
+      GearList(
+        id: GearListId(0),
         name: name,
         notes: "",
         readOnly: false,
@@ -85,10 +84,10 @@ class GearListVersionDataProvider
     final id = result.success;
     await TableAccessor.database.execute(
       """
-      insert into ${Tables.gearListItem}(${Columns.gearItemId}, ${Columns.gearListVersionId}, ${Columns.count}, ${Columns.packed}) 
+      insert into ${Tables.gearListItem}(${Columns.gearItemId}, ${Columns.gearListId}, ${Columns.count}, ${Columns.packed}) 
       select ${Columns.gearItemId}, $id, ${Columns.count}, ${Columns.packed}
       from ${Tables.gearListItem} 
-      where ${Columns.gearListVersionId} = ${cloneId.id};
+      where ${Columns.gearListId} = ${cloneId.id};
       """,
     );
     return Result.success(null);
@@ -106,22 +105,22 @@ class GearListItemDataProvider
   @override
   final GearListItemAccessor tableAccessor = GearListItemAccessor();
 
-  Future<List<(GearListItem, GearItem)>> getWithItemByVersionAndCategory(
-    GearListVersionId gearListVersionId,
+  Future<List<(GearListItem, GearItem)>> getWithItemByListAndCategory(
+    GearListId gearListId,
     GearCategoryId gearCategoryId,
   ) =>
-      tableAccessor.getWithItemByVersionAndCategory(
-        gearListVersionId,
+      tableAccessor.getWithItemByListAndCategory(
+        gearListId,
         gearCategoryId,
       );
 
   Future<List<((GearListItem?, GearListItem?), GearItem)>>
-      getWithItemByVersionsAndCategory(
-    (GearListVersionId, GearListVersionId) gearListVersionIds,
+      getWithItemByListsAndCategory(
+    (GearListId, GearListId) gearListIds,
     GearCategoryId gearCategoryId,
   ) =>
-          tableAccessor.getWithItemByVersionsAndCategory(
-            gearListVersionIds,
+          tableAccessor.getWithItemByListsAndCategory(
+            gearListIds,
             gearCategoryId,
           );
 }
@@ -171,8 +170,7 @@ class ModelDataProvider extends ChangeNotifier {
   factory ModelDataProvider() {
     if (_instance == null) {
       final instance = ModelDataProvider._();
-      instance._gearListVersionDataProvider
-          .addListener(instance.notifyListeners);
+      instance._gearListDataProvider.addListener(instance.notifyListeners);
       instance._gearListItemDataProvider.addListener(instance.notifyListeners);
       instance._gearItemDataProvider.addListener(instance.notifyListeners);
       instance._gearCategoryDataProvider.addListener(instance.notifyListeners);
@@ -185,7 +183,7 @@ class ModelDataProvider extends ChangeNotifier {
 
   static ModelDataProvider? _instance;
 
-  final _gearListVersionDataProvider = GearListVersionDataProvider();
+  final _gearListDataProvider = GearListDataProvider();
   final _gearListItemDataProvider = GearListItemDataProvider();
   final _gearItemDataProvider = GearItemDataProvider();
   final _gearCategoryDataProvider = GearCategoryDataProvider();
@@ -209,9 +207,9 @@ class ModelDataProvider extends ChangeNotifier {
   }
 
   Future<void> _createModel(GearModel model) async {
-    for (final gearListVersion in model.gearListVersions) {
-      await _gearListVersionDataProvider.create(
-        gearListVersion,
+    for (final gearList in model.gearLists) {
+      await _gearListDataProvider.create(
+        gearList,
         autoId: false,
         notify: false,
       );
@@ -260,7 +258,7 @@ class ModelDataProvider extends ChangeNotifier {
 
   Future<void> storeModel() async {
     final model = GearModel(
-      gearListVersions: await _gearListVersionDataProvider.getAll(),
+      gearLists: await _gearListDataProvider.getAll(),
       gearListItems: await _gearListItemDataProvider.getAll(),
       gearItems: await _gearItemDataProvider.getAll(),
       gearCategories: await _gearCategoryDataProvider.getAll(),
@@ -286,16 +284,16 @@ class GearListOverviewDataProvider extends ChangeNotifier {
   static GearListOverviewDataProvider? _instance;
 
   final _dataProvider = ModelDataProvider();
-  GearListVersionDataProvider get gearListVersionDataProvider =>
-      _dataProvider._gearListVersionDataProvider;
+  GearListDataProvider get gearListDataProvider =>
+      _dataProvider._gearListDataProvider;
 
-  List<GearListVersion> _gearListVersions = [];
-  List<GearListVersion> get gearListVersions => _gearListVersions;
+  List<GearList> _gearLists = [];
+  List<GearList> get gearLists => _gearLists;
 
   void setState() => notifyListeners();
 
   Future<void> _onUpdate() async {
-    _gearListVersions = await gearListVersionDataProvider.getAll();
+    _gearLists = await gearListDataProvider.getAll();
     notifyListeners();
   }
 }
@@ -378,8 +376,8 @@ class GearListDetailsDataProvider extends ChangeNotifier {
   static GearListDetailsDataProvider? _instance;
 
   final _dataProvider = ModelDataProvider();
-  GearListVersionDataProvider get gearListVersionDataProvider =>
-      _dataProvider._gearListVersionDataProvider;
+  GearListDataProvider get gearListDataProvider =>
+      _dataProvider._gearListDataProvider;
   GearListItemDataProvider get gearListItemDataProvider =>
       _dataProvider._gearListItemDataProvider;
   GearItemDataProvider get gearItemDataProvider =>
@@ -387,18 +385,18 @@ class GearListDetailsDataProvider extends ChangeNotifier {
 
   Map<GearCategoryId, List<GearItem>> _gearItems = {};
   Map<GearCategoryId, List<GearItem>> get gearItems => _gearItems;
-  GearListVersionId? _gearListVersionId;
+  GearListId? _gearListId;
 
   (
-    GearListVersion,
+    GearList,
     List<(GearCategory, List<(GearListItem, GearItem)>)>
-  )? _gearItemsForListVersion;
-  (GearListVersion, List<(GearCategory, List<(GearListItem, GearItem)>)>)?
-      gearItemsForListVersion(GearListVersionId gearListVersionId) {
-    if (_gearListVersionId == gearListVersionId) {
-      return _gearItemsForListVersion;
+  )? _gearItemsForList;
+  (GearList, List<(GearCategory, List<(GearListItem, GearItem)>)>)?
+      gearItemsForList(GearListId gearListId) {
+    if (_gearListId == gearListId) {
+      return _gearItemsForList;
     } else {
-      _gearListVersionId = gearListVersionId;
+      _gearListId = gearListId;
       _onUpdate();
       return null;
     }
@@ -415,12 +413,12 @@ class GearListDetailsDataProvider extends ChangeNotifier {
       }
     }
     _gearItems = gearItemMap;
-    if (_gearListVersionId == null) {
+    if (_gearListId == null) {
       notifyListeners();
       return;
     }
-    final gearListVersion = await _dataProvider._gearListVersionDataProvider
-        .getById(_gearListVersionId!);
+    final gearList =
+        await _dataProvider._gearListDataProvider.getById(_gearListId!);
     final gearListCategories =
         await _dataProvider._gearCategoryDataProvider.getAll();
     final categoriesWithItems =
@@ -428,14 +426,14 @@ class GearListDetailsDataProvider extends ChangeNotifier {
     for (final gearCategory in gearListCategories) {
       final gearListItemsWithItems = await _dataProvider
           ._gearListItemDataProvider
-          .getWithItemByVersionAndCategory(
-        _gearListVersionId!,
+          .getWithItemByListAndCategory(
+        _gearListId!,
         gearCategory.id,
       );
       categoriesWithItems.add((gearCategory, gearListItemsWithItems));
     }
 
-    _gearItemsForListVersion = (gearListVersion, categoriesWithItems);
+    _gearItemsForList = (gearList, categoriesWithItems);
 
     notifyListeners();
   }
@@ -457,8 +455,8 @@ class GearListCompareDataProvider extends ChangeNotifier {
   static GearListCompareDataProvider? _instance;
 
   final _dataProvider = ModelDataProvider();
-  GearListVersionDataProvider get gearListVersionDataProvider =>
-      _dataProvider._gearListVersionDataProvider;
+  GearListDataProvider get gearListDataProvider =>
+      _dataProvider._gearListDataProvider;
   GearListItemDataProvider get gearListItemDataProvider =>
       _dataProvider._gearListItemDataProvider;
   GearItemDataProvider get gearItemDataProvider =>
@@ -466,22 +464,22 @@ class GearListCompareDataProvider extends ChangeNotifier {
 
   Map<GearCategoryId, List<GearItem>> _gearItems = {};
   Map<GearCategoryId, List<GearItem>> get gearItems => _gearItems;
-  (GearListVersionId, GearListVersionId)? _gearListVersionIds;
+  (GearListId, GearListId)? _gearListIds;
 
   (
-    (GearListVersion, GearListVersion),
+    (GearList, GearList),
     List<(GearCategory, List<((GearListItem?, GearListItem?), GearItem)>)>
-  )? _gearItemsForListVersion;
+  )? _gearItemsForList;
   (
-    (GearListVersion, GearListVersion),
+    (GearList, GearList),
     List<(GearCategory, List<((GearListItem?, GearListItem?), GearItem)>)>
-  )? gearItemsForListVersion(
-    (GearListVersionId, GearListVersionId) gearListVersionIds,
+  )? gearItemsForList(
+    (GearListId, GearListId) gearListIds,
   ) {
-    if (_gearListVersionIds == gearListVersionIds) {
-      return _gearItemsForListVersion;
+    if (_gearListIds == gearListIds) {
+      return _gearItemsForList;
     } else {
-      _gearListVersionIds = gearListVersionIds;
+      _gearListIds = gearListIds;
       _onUpdate();
       return null;
     }
@@ -498,14 +496,14 @@ class GearListCompareDataProvider extends ChangeNotifier {
       }
     }
     _gearItems = gearItemMap;
-    if (_gearListVersionIds == null) {
+    if (_gearListIds == null) {
       notifyListeners();
       return;
     }
-    final gearListVersion1 = await _dataProvider._gearListVersionDataProvider
-        .getById(_gearListVersionIds!.$1);
-    final gearListVersion2 = await _dataProvider._gearListVersionDataProvider
-        .getById(_gearListVersionIds!.$2);
+    final gearList1 =
+        await _dataProvider._gearListDataProvider.getById(_gearListIds!.$1);
+    final gearList2 =
+        await _dataProvider._gearListDataProvider.getById(_gearListIds!.$2);
     final gearListCategories =
         await _dataProvider._gearCategoryDataProvider.getAll();
     final categoriesWithItems =
@@ -513,15 +511,14 @@ class GearListCompareDataProvider extends ChangeNotifier {
     for (final gearCategory in gearListCategories) {
       final gearListItemsWithItems = await _dataProvider
           ._gearListItemDataProvider
-          .getWithItemByVersionsAndCategory(
-        _gearListVersionIds!,
+          .getWithItemByListsAndCategory(
+        _gearListIds!,
         gearCategory.id,
       );
       categoriesWithItems.add((gearCategory, gearListItemsWithItems));
     }
 
-    _gearItemsForListVersion =
-        ((gearListVersion1, gearListVersion2), categoriesWithItems);
+    _gearItemsForList = ((gearList1, gearList2), categoriesWithItems);
 
     notifyListeners();
   }

@@ -8,14 +8,14 @@ import 'package:provider/provider.dart';
 class GearListOverview extends StatelessWidget {
   const GearListOverview({
     super.key,
-    required this.onSelectGearListVersion,
-    required this.onToggleCompareGearListVersion,
+    required this.onSelectGearList,
+    required this.onToggleCompareGearList,
     required this.selectedCompare,
   });
 
-  final void Function(GearListVersion) onSelectGearListVersion;
-  final void Function(GearListVersion) onToggleCompareGearListVersion;
-  final (GearListVersion?, GearListVersion?) selectedCompare;
+  final void Function(GearList) onSelectGearList;
+  final void Function(GearList) onToggleCompareGearList;
+  final (GearList?, GearList?) selectedCompare;
 
   @override
   Widget build(BuildContext context) {
@@ -30,24 +30,23 @@ class GearListOverview extends StatelessWidget {
               children: [
                 FilledButton.icon(
                   onPressed: () async {
-                    final newVersion = await showCloneVersionDialog(
+                    final newList = await showCloneDialog(
                       context,
-                      dataProvider.gearListVersions,
+                      dataProvider.gearLists,
                     );
-                    if (newVersion != null) {
-                      final (name, cloneVersionId) = newVersion;
+                    if (newList != null) {
+                      final (name, cloneListId) = newList;
                       final Result<void> result;
-                      if (cloneVersionId != null) {
-                        result = await dataProvider.gearListVersionDataProvider
-                            .cloneVersion(
+                      if (cloneListId != null) {
+                        result =
+                            await dataProvider.gearListDataProvider.cloneList(
                           name,
-                          cloneVersionId,
+                          cloneListId,
                         );
                       } else {
-                        result = await dataProvider.gearListVersionDataProvider
-                            .create(
-                          GearListVersion(
-                            id: GearListVersionId(0),
+                        result = await dataProvider.gearListDataProvider.create(
+                          GearList(
+                            id: GearListId(0),
                             name: name,
                             notes: "",
                             readOnly: false,
@@ -60,31 +59,30 @@ class GearListOverview extends StatelessWidget {
                           context,
                           "An Error Occurred",
                           result.error!.isUniqueViolation
-                              ? "A version with the same name already exists."
+                              ? "A list with the same name already exists."
                               : result.errorMessage!,
                         );
                       }
                     }
                   },
                   icon: const Icon(Icons.add_rounded),
-                  label: const Text("Add Version"),
+                  label: const Text("Add List"),
                 ),
                 Expanded(
                   child: ListView.builder(
-                    itemCount: dataProvider.gearListVersions.length,
+                    itemCount: dataProvider.gearLists.length,
                     itemBuilder: (context, index) {
-                      final gearListVersion =
-                          dataProvider.gearListVersions[index];
+                      final gearList = dataProvider.gearLists[index];
                       return Row(
                         children: [
                           Text(
-                            gearListVersion.name,
+                            gearList.name,
                             style: Theme.of(context).textTheme.bodyLarge,
                           ),
                           const Spacer(),
                           IconButton(
-                            onPressed: () => onSelectGearListVersion(
-                              gearListVersion,
+                            onPressed: () => onSelectGearList(
+                              gearList,
                             ),
                             icon: const Icon(Icons.open_in_new),
                           ),
@@ -92,18 +90,18 @@ class GearListOverview extends StatelessWidget {
                             onPressed: () async {
                               final name = await showNameDialog(
                                 context,
-                                gearListVersion.name,
+                                gearList.name,
                               );
                               if (name != null) {
                                 final result = await dataProvider
-                                    .gearListVersionDataProvider
-                                    .update(gearListVersion..name = name);
+                                    .gearListDataProvider
+                                    .update(gearList..name = name);
                                 if (result.isError && context.mounted) {
                                   await showMessageDialog(
                                     context,
                                     "An Error Occurred",
                                     result.error!.isUniqueViolation
-                                        ? "A version with the same name already exists."
+                                        ? "A list with the same name already exists."
                                         : result.errorMessage!,
                                   );
                                 }
@@ -115,23 +113,23 @@ class GearListOverview extends StatelessWidget {
                             onPressed: () async {
                               final delete = await showDeleteWarningDialog(
                                 context,
-                                gearListVersion.name,
+                                gearList.name,
                                 null,
                               );
                               if (delete) {
-                                await dataProvider.gearListVersionDataProvider
-                                    .delete(gearListVersion);
+                                await dataProvider.gearListDataProvider
+                                    .delete(gearList);
                               }
                             },
                             icon: const Icon(Icons.delete_rounded),
                           ),
                           IconButton(
-                            onPressed: () => onToggleCompareGearListVersion(
-                              gearListVersion,
+                            onPressed: () => onToggleCompareGearList(
+                              gearList,
                             ),
                             icon: Icon(
-                              gearListVersion == selectedCompare.$1 ||
-                                      gearListVersion == selectedCompare.$2
+                              gearList == selectedCompare.$1 ||
+                                      gearList == selectedCompare.$2
                                   ? Icons.check_circle_outline_rounded
                                   : Icons.compare_rounded,
                             ),

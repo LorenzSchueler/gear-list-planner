@@ -59,24 +59,23 @@ abstract class TableAccessor<I extends Id, E extends Entity<I>> {
   }
 }
 
-class GearListVersionAccessor
-    extends TableAccessor<GearListVersionId, GearListVersion> {
+class GearListAccessor extends TableAccessor<GearListId, GearList> {
   @override
-  GearListVersion fromDbRecord(Map<String, dynamic> dbRecord) {
+  GearList fromDbRecord(Map<String, dynamic> dbRecord) {
     final map = Map.of(dbRecord);
     map[Columns.readOnly] = map[Columns.readOnly] as int == 0 ? false : true;
-    return GearListVersion.fromJson(map);
+    return GearList.fromJson(map);
   }
 
   @override
-  Map<String, dynamic> toDbRecord(GearListVersion object) {
+  Map<String, dynamic> toDbRecord(GearList object) {
     final json = object.toJson();
     json[Columns.readOnly] = json[Columns.readOnly] as bool ? 1 : 0;
     return json;
   }
 
   @override
-  String tableName = Tables.gearListVersion;
+  String tableName = Tables.gearList;
 }
 
 class GearListItemAccessor extends TableAccessor<GearListItemId, GearListItem> {
@@ -97,8 +96,8 @@ class GearListItemAccessor extends TableAccessor<GearListItemId, GearListItem> {
   @override
   String tableName = Tables.gearListItem;
 
-  Future<List<(GearListItem, GearItem)>> getWithItemByVersionAndCategory(
-    GearListVersionId gearListVersionId,
+  Future<List<(GearListItem, GearItem)>> getWithItemByListAndCategory(
+    GearListId gearListId,
     GearCategoryId gearCategoryId,
   ) async {
     final data = await TableAccessor.database.rawQuery(
@@ -107,7 +106,7 @@ class GearListItemAccessor extends TableAccessor<GearListItemId, GearListItem> {
         ${_fullyQualifiedNames(Tables.gearListItem, [
             Columns.id,
             Columns.gearItemId,
-            Columns.gearListVersionId,
+            Columns.gearListId,
             Columns.count,
             Columns.packed,
           ])},
@@ -122,7 +121,7 @@ class GearListItemAccessor extends TableAccessor<GearListItemId, GearListItem> {
       from ${Tables.gearListItem}
       inner join ${Tables.gearItem}
       on ${Tables.gearListItem}.${Columns.gearItemId} = ${Tables.gearItem}.${Columns.id}
-      where ${Tables.gearListItem}.${Columns.gearListVersionId} = ${gearListVersionId.id}
+      where ${Tables.gearListItem}.${Columns.gearListId} = ${gearListId.id}
       and ${Tables.gearItem}.${Columns.gearCategoryId} = ${gearCategoryId.id}
       order by ${Tables.gearItem}.${Columns.sortIndex};
       """,
@@ -157,8 +156,8 @@ class GearListItemAccessor extends TableAccessor<GearListItemId, GearListItem> {
   }
 
   Future<List<((GearListItem?, GearListItem?), GearItem)>>
-      getWithItemByVersionsAndCategory(
-    (GearListVersionId, GearListVersionId) gearListVersionIds,
+      getWithItemByListsAndCategory(
+    (GearListId, GearListId) gearListIds,
     GearCategoryId gearCategoryId,
   ) async {
     const tableGearListItem2 = "gear_list_item_2";
@@ -168,14 +167,14 @@ class GearListItemAccessor extends TableAccessor<GearListItemId, GearListItem> {
         ${_fullyQualifiedNames(Tables.gearListItem, [
             Columns.id,
             Columns.gearItemId,
-            Columns.gearListVersionId,
+            Columns.gearListId,
             Columns.count,
             Columns.packed,
           ])},
         ${_fullyQualifiedNames(tableGearListItem2, [
             Columns.id,
             Columns.gearItemId,
-            Columns.gearListVersionId,
+            Columns.gearListId,
             Columns.count,
             Columns.packed,
           ])},
@@ -190,12 +189,12 @@ class GearListItemAccessor extends TableAccessor<GearListItemId, GearListItem> {
       from ${Tables.gearItem}
       left outer join (
         select * from ${Tables.gearListItem}
-        where ${Tables.gearListItem}.${Columns.gearListVersionId} = ${gearListVersionIds.$1.id}
+        where ${Tables.gearListItem}.${Columns.gearListId} = ${gearListIds.$1.id}
       ) as ${Tables.gearListItem}
       on ${Tables.gearListItem}.${Columns.gearItemId} = ${Tables.gearItem}.${Columns.id}
       left outer join (
         select * from ${Tables.gearListItem}
-        where ${Tables.gearListItem}.${Columns.gearListVersionId} = ${gearListVersionIds.$2.id}
+        where ${Tables.gearListItem}.${Columns.gearListId} = ${gearListIds.$2.id}
       ) as $tableGearListItem2
       on $tableGearListItem2.${Columns.gearItemId} = ${Tables.gearItem}.${Columns.id}
       where ${Tables.gearItem}.${Columns.gearCategoryId} = ${gearCategoryId.id}

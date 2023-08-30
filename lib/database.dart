@@ -10,8 +10,8 @@ abstract final class AppDatabase {
       _databasePath,
       version: 1,
       onCreate: (db, version) async {
-        final gearListVersionTable = Table(
-          Tables.gearListVersion,
+        final gearListTable = Table(
+          Tables.gearList,
           [
             Column.idColumn(),
             Column.stringColumn(Columns.name),
@@ -26,11 +26,11 @@ abstract final class AppDatabase {
           [
             Column.idColumn(),
             Column.fkColumn(Columns.gearItemId, Tables.gearItem),
-            Column.fkColumn(Columns.gearListVersionId, Tables.gearListVersion),
+            Column.fkColumn(Columns.gearListId, Tables.gearList),
             Column.intColumn(Columns.count),
             Column.boolColumn(Columns.packed),
           ],
-          [Columns.gearItemId, Columns.gearListVersionId],
+          [Columns.gearItemId, Columns.gearListId],
         );
 
         final gearItemTable = Table(
@@ -55,7 +55,7 @@ abstract final class AppDatabase {
           [Columns.name],
         );
 
-        await db.execute(gearListVersionTable.setupSql);
+        await db.execute(gearListTable.setupSql);
         await db.execute(gearCategoryTable.setupSql);
         await db.execute(gearItemTable.setupSql);
         await db.execute(gearListItemTable.setupSql);
@@ -67,14 +67,14 @@ abstract final class AppDatabase {
   }
 
   static Future<void> clearDatabase() async {
-    await database.delete(Tables.gearListVersion);
+    await database.delete(Tables.gearList);
     await database.delete(Tables.gearCategory);
     // other tables deleted by cascading delete
   }
 }
 
 abstract final class Tables {
-  static const gearListVersion = "gear_list_version";
+  static const gearList = "gear_list";
   static const gearListItem = "gear_list_item";
   static const gearItem = "gear_item";
   static const gearCategory = "gear_category";
@@ -84,7 +84,7 @@ abstract final class Columns {
   static const count = "count";
   static const id = "id";
   static const sortIndex = "sort_index";
-  static const gearListVersionId = "gear_list_version_id";
+  static const gearListId = "gear_list_id";
   static const gearListItemId = "gear_list_item_id";
   static const gearItemId = "gear_item_id";
   static const gearCategoryId = "gear_category_id";

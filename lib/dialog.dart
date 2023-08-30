@@ -239,32 +239,32 @@ class _TypeNameWeightDialogState extends State<_TypeNameWeightDialog> {
   }
 }
 
-Future<(String, GearListVersionId?)?> showCloneVersionDialog(
+Future<(String, GearListId?)?> showCloneDialog(
   BuildContext context,
-  List<GearListVersion> versions,
+  List<GearList> lists,
 ) {
-  return showDialog<(String, GearListVersionId?)>(
+  return showDialog<(String, GearListId?)>(
     context: context,
-    builder: (_) => _CloneVersionDialog(
-      versions: versions,
+    builder: (_) => _CloneDialog(
+      lists: lists,
     ),
   );
 }
 
-class _CloneVersionDialog extends StatefulWidget {
-  const _CloneVersionDialog({required this.versions});
+class _CloneDialog extends StatefulWidget {
+  const _CloneDialog({required this.lists});
 
-  final List<GearListVersion> versions;
+  final List<GearList> lists;
 
   @override
-  State<_CloneVersionDialog> createState() => _CloneVersionDialogState();
+  State<_CloneDialog> createState() => _CloneDialogState();
 }
 
-class _CloneVersionDialogState extends State<_CloneVersionDialog> {
+class _CloneDialogState extends State<_CloneDialog> {
   final _formKey = GlobalKey<FormState>();
 
   String _name = "";
-  GearListVersionId? _versionId;
+  GearListId? _listId;
 
   @override
   Widget build(BuildContext context) {
@@ -287,10 +287,10 @@ class _CloneVersionDialogState extends State<_CloneVersionDialog> {
             ),
             const SizedBox(height: 10),
             const Text(
-              "You can create a new version by cloning an existing one or create one from scratch.",
+              "You can create a new list by cloning an existing one or create one from scratch.",
             ),
             DropdownButtonFormField(
-              items: widget.versions
+              items: widget.lists
                   .map(
                     (v) => DropdownMenuItem(
                       value: v.id,
@@ -301,7 +301,7 @@ class _CloneVersionDialogState extends State<_CloneVersionDialog> {
                 ..add(
                   const DropdownMenuItem(child: Text("create from scratch")),
                 ),
-              onChanged: (versionId) => setState(() => _versionId = versionId),
+              onChanged: (listId) => setState(() => _listId = listId),
             ),
           ],
         ),
@@ -312,7 +312,7 @@ class _CloneVersionDialogState extends State<_CloneVersionDialog> {
           ),
           TextButton(
             onPressed: _formKey.currentState?.validate() ?? false
-                ? () => Navigator.of(context).pop((_name, _versionId))
+                ? () => Navigator.of(context).pop((_name, _listId))
                 : null,
             child: const Text("Create"),
           ),

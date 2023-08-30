@@ -8,23 +8,22 @@ import 'package:provider/provider.dart';
 class GearListDetailsLoadWrapper extends StatelessWidget {
   const GearListDetailsLoadWrapper({
     super.key,
-    required this.gearListVersionId,
+    required this.gearListId,
   });
 
-  final GearListVersionId gearListVersionId;
+  final GearListId gearListId;
 
   @override
   Widget build(BuildContext context) {
     return Consumer<GearListDetailsDataProvider>(
       builder: (context, dataProvider, _) {
-        final gearItemsForListVersion =
-            dataProvider.gearItemsForListVersion(gearListVersionId);
-        return gearItemsForListVersion == null
+        final gearItemsForList = dataProvider.gearItemsForList(gearListId);
+        return gearItemsForList == null
             ? const Center(child: CircularProgressIndicator())
             : _GearListDetails(
                 dataProvider: dataProvider,
-                gearListVersion: gearItemsForListVersion.$1,
-                categoriesWithItems: gearItemsForListVersion.$2,
+                gearList: gearItemsForList.$1,
+                categoriesWithItems: gearItemsForList.$2,
               );
       },
     );
@@ -34,12 +33,12 @@ class GearListDetailsLoadWrapper extends StatelessWidget {
 class _GearListDetails extends StatelessWidget {
   const _GearListDetails({
     required this.dataProvider,
-    required this.gearListVersion,
+    required this.gearList,
     required this.categoriesWithItems,
   });
 
   final GearListDetailsDataProvider dataProvider;
-  final GearListVersion gearListVersion;
+  final GearList gearList;
   final List<(GearCategory, List<(GearListItem, GearItem)>)>
       categoriesWithItems;
 
@@ -74,7 +73,7 @@ class _GearListDetails extends StatelessWidget {
                           gearCategory.name,
                           style: Theme.of(context).textTheme.titleLarge,
                         ),
-                        if (!gearListVersion.readOnly) ...[
+                        if (!gearList.readOnly) ...[
                           _ListItemInput(
                             onAdd: (gearItemId) async {
                               final result = await dataProvider
@@ -83,7 +82,7 @@ class _GearListDetails extends StatelessWidget {
                                 GearListItem(
                                   id: GearListItemId(0),
                                   gearItemId: gearItemId,
-                                  gearListVersionId: gearListVersion.id,
+                                  gearListId: gearList.id,
                                   count: 1,
                                   packed: false,
                                 ),
@@ -117,7 +116,7 @@ class _GearListDetails extends StatelessWidget {
                                 children: [
                                   Checkbox(
                                     value: gearListItem.packed,
-                                    onChanged: gearListVersion.readOnly
+                                    onChanged: gearList.readOnly
                                         ? null
                                         : (packed) async {
                                             if (packed != null) {
@@ -138,7 +137,7 @@ class _GearListDetails extends StatelessWidget {
                                           },
                                   ),
                                   IconButton(
-                                    onPressed: gearListVersion.readOnly ||
+                                    onPressed: gearList.readOnly ||
                                             gearListItem.count <= 1
                                         ? null
                                         : () async {
@@ -164,7 +163,7 @@ class _GearListDetails extends StatelessWidget {
                                         Theme.of(context).textTheme.bodyLarge,
                                   ),
                                   IconButton(
-                                    onPressed: gearListVersion.readOnly
+                                    onPressed: gearList.readOnly
                                         ? null
                                         : () async {
                                             final result = await dataProvider
@@ -206,7 +205,7 @@ class _GearListDetails extends StatelessWidget {
                                         Theme.of(context).textTheme.bodyLarge,
                                   ),
                                   IconButton(
-                                    onPressed: gearListVersion.readOnly
+                                    onPressed: gearList.readOnly
                                         ? null
                                         : () => dataProvider
                                             .gearListItemDataProvider
@@ -244,13 +243,13 @@ class _GearListDetails extends StatelessWidget {
                       Row(
                         children: [
                           Checkbox(
-                            value: gearListVersion.readOnly,
+                            value: gearList.readOnly,
                             onChanged: (readOnly) async {
                               if (readOnly != null) {
                                 final result = await dataProvider
-                                    .gearListVersionDataProvider
+                                    .gearListDataProvider
                                     .update(
-                                  gearListVersion..readOnly = readOnly,
+                                  gearList..readOnly = readOnly,
                                 );
                                 if (result.isError && context.mounted) {
                                   await showMessageDialog(
@@ -274,7 +273,7 @@ class _GearListDetails extends StatelessWidget {
                           const Text("Show Unpacked Only"),
                         ],
                       ),
-                      if (!gearListVersion.readOnly)
+                      if (!gearList.readOnly)
                         FilledButton(
                           onPressed: () async {
                             final mark = await showWarningDialog(
@@ -298,16 +297,16 @@ class _GearListDetails extends StatelessWidget {
                         child: Padding(
                           padding: const EdgeInsets.symmetric(vertical: 10),
                           child: TextFormField(
-                            initialValue: gearListVersion.notes,
+                            initialValue: gearList.notes,
                             onChanged: (value) {
-                              dataProvider.gearListVersionDataProvider
-                                  .update(gearListVersion..notes = value);
+                              dataProvider.gearListDataProvider
+                                  .update(gearList..notes = value);
                             },
                             maxLines: null,
                             decoration: const InputDecoration.collapsed(
                               hintText: "Notes",
                             ),
-                            enabled: !gearListVersion.readOnly,
+                            enabled: !gearList.readOnly,
                           ),
                         ),
                       ),

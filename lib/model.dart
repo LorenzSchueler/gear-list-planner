@@ -21,14 +21,14 @@ abstract class Entity<I extends Id> {
   int get hashCode => id.hashCode;
 }
 
-class GearListVersionId implements Id {
-  GearListVersionId(this.id);
+class GearListId implements Id {
+  GearListId(this.id);
 
   @override
   final int id;
 
   @override
-  bool operator ==(other) => other is GearListVersionId && other.id == id;
+  bool operator ==(other) => other is GearListId && other.id == id;
 
   @override
   int get hashCode => id.hashCode;
@@ -38,23 +38,23 @@ class GearListVersionId implements Id {
 }
 
 @JsonSerializable()
-class GearListVersion extends Entity<GearListVersionId> {
-  GearListVersion({
+class GearList extends Entity<GearListId> {
+  GearList({
     required this.id,
     required this.name,
     required this.notes,
     required this.readOnly,
   });
 
-  factory GearListVersion.fromJson(Map<String, dynamic> json) =>
-      _$GearListVersionFromJson(json);
+  factory GearList.fromJson(Map<String, dynamic> json) =>
+      _$GearListFromJson(json);
 
   @override
-  Map<String, dynamic> toJson() => _$GearListVersionToJson(this);
+  Map<String, dynamic> toJson() => _$GearListToJson(this);
 
   @override
-  @JsonKey(fromJson: GearListVersionId.new, toJson: Id._toJson)
-  final GearListVersionId id;
+  @JsonKey(fromJson: GearListId.new, toJson: Id._toJson)
+  final GearListId id;
   String name;
   String notes;
   bool readOnly;
@@ -84,7 +84,7 @@ class GearListItem extends Entity<GearListItemId> {
   GearListItem({
     required this.id,
     required this.gearItemId,
-    required this.gearListVersionId,
+    required this.gearListId,
     required this.count,
     required this.packed,
   });
@@ -100,8 +100,8 @@ class GearListItem extends Entity<GearListItemId> {
   final GearListItemId id;
   @JsonKey(fromJson: GearItemId.new, toJson: Id._toJson)
   GearItemId gearItemId;
-  @JsonKey(fromJson: GearListVersionId.new, toJson: Id._toJson)
-  GearListVersionId gearListVersionId;
+  @JsonKey(fromJson: GearListId.new, toJson: Id._toJson)
+  GearListId gearListId;
   int count;
   bool packed;
 
@@ -197,7 +197,7 @@ class GearCategory extends Entity<GearCategoryId> {
 @JsonSerializable()
 class GearModel {
   GearModel({
-    required this.gearListVersions,
+    required this.gearLists,
     required this.gearListItems,
     required this.gearItems,
     required this.gearCategories,
@@ -208,7 +208,7 @@ class GearModel {
 
   Map<String, dynamic> toJson() => _$GearModelToJson(this);
 
-  List<GearListVersion> gearListVersions;
+  List<GearList> gearLists;
   List<GearListItem> gearListItems;
   List<GearItem> gearItems;
   List<GearCategory> gearCategories;
