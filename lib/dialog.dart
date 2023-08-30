@@ -1,12 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:gear_list_planner/model.dart';
 
+Future<void> showMessageDialog(
+  BuildContext context,
+  String title,
+  String message,
+) async {
+  await showDialog<void>(
+    context: context,
+    builder: (_) => AlertDialog(
+      title: Text(title),
+      content: Text(message),
+      actions: [
+        TextButton(
+          child: const Text("OK"),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+      ],
+    ),
+  );
+}
+
 Future<bool> showDeleteWarningDialog(
   BuildContext context,
   String entityName,
   String? message,
 ) =>
-    showWarningDialog(context, "Delete $entityName", message, "Delete");
+    showWarningDialog(context, "Delete $entityName?", message, "Delete");
 
 Future<bool> showWarningDialog(
   BuildContext context,

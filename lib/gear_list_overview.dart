@@ -45,8 +45,18 @@ class GearListOverview extends StatelessWidget {
                               final name =
                                   await showNameDialog(context, gearList.name);
                               if (name != null) {
-                                await dataProvider.gearListDataProvider
+                                final result = await dataProvider
+                                    .gearListDataProvider
                                     .update(gearList..name = name);
+                                if (result.isError && context.mounted) {
+                                  await showMessageDialog(
+                                    context,
+                                    "An Error Occurred",
+                                    result.error!.isUniqueViolation
+                                        ? "A list with the same name already exists."
+                                        : result.errorMessage!,
+                                  );
+                                }
                               }
                             },
                             icon: const Icon(Icons.edit_rounded),
@@ -83,7 +93,8 @@ class GearListOverview extends StatelessWidget {
                                 cloneVersionId,
                               );
                             } else {
-                              await dataProvider.gearListVersionDataProvider
+                              final result = await dataProvider
+                                  .gearListVersionDataProvider
                                   .create(
                                 GearListVersion(
                                   id: GearListVersionId(0),
@@ -93,6 +104,15 @@ class GearListOverview extends StatelessWidget {
                                 ),
                                 autoId: true,
                               );
+                              if (result.isError && context.mounted) {
+                                await showMessageDialog(
+                                  context,
+                                  "An Error Occurred",
+                                  result.error!.isUniqueViolation
+                                      ? "A version with the same name already exists."
+                                      : result.errorMessage!,
+                                );
+                              }
                             }
                           }
                         },
@@ -124,9 +144,18 @@ class GearListOverview extends StatelessWidget {
                                       gearListVersion.name,
                                     );
                                     if (name != null) {
-                                      await dataProvider
+                                      final result = await dataProvider
                                           .gearListVersionDataProvider
                                           .update(gearListVersion..name = name);
+                                      if (result.isError && context.mounted) {
+                                        await showMessageDialog(
+                                          context,
+                                          "An Error Occurred",
+                                          result.error!.isUniqueViolation
+                                              ? "A version with the same name already exists."
+                                              : result.errorMessage!,
+                                        );
+                                      }
                                     }
                                   },
                                   icon: const Icon(Icons.edit_rounded),
@@ -183,8 +212,17 @@ class GearListOverview extends StatelessWidget {
                       if (name != null) {
                         final gearList =
                             GearList(id: GearListId(0), name: name);
-                        await dataProvider.gearListDataProvider
+                        final result = await dataProvider.gearListDataProvider
                             .create(gearList, autoId: true);
+                        if (result.isError && context.mounted) {
+                          await showMessageDialog(
+                            context,
+                            "An Error Occurred",
+                            result.error!.isUniqueViolation
+                                ? "A list with the same name already exists."
+                                : result.errorMessage!,
+                          );
+                        }
                       }
                     },
                     child: const Text("Add List"),

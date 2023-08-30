@@ -38,8 +38,18 @@ class GearItemOverview extends StatelessWidget {
                                 gearCategory.name,
                               );
                               if (name != null) {
-                                await dataProvider.gearCategoryDataProvider
+                                final result = await dataProvider
+                                    .gearCategoryDataProvider
                                     .update(gearCategory..name = name);
+                                if (result.isError && context.mounted) {
+                                  await showMessageDialog(
+                                    context,
+                                    "An Error Occurred",
+                                    result.error!.isUniqueViolation
+                                        ? "A category with the same name already exists."
+                                        : result.errorMessage!,
+                                  );
+                                }
                               }
                             },
                             icon: const Icon(Icons.edit_rounded),
@@ -61,8 +71,9 @@ class GearItemOverview extends StatelessWidget {
                         ],
                       ),
                       _ItemInput(
-                        onAdd: (name, weight) {
-                          dataProvider.gearItemDataProvider.create(
+                        onAdd: (name, weight) async {
+                          final result =
+                              await dataProvider.gearItemDataProvider.create(
                             GearItem(
                               id: GearItemId(0),
                               gearCategoryId: gearCategory.id,
@@ -73,6 +84,15 @@ class GearItemOverview extends StatelessWidget {
                             autoId: true,
                             autoSortIndex: true,
                           );
+                          if (result.isError && context.mounted) {
+                            await showMessageDialog(
+                              context,
+                              "An Error Occurred",
+                              result.error!.isUniqueViolation
+                                  ? "An item with the same name already exists."
+                                  : result.errorMessage!,
+                            );
+                          }
                         },
                       ),
                       const SizedBox(height: 10),
@@ -100,19 +120,30 @@ class GearItemOverview extends StatelessWidget {
                                 ),
                                 IconButton(
                                   onPressed: () async {
-                                    final x = await showNameWeightDialog(
+                                    final nameWeight =
+                                        await showNameWeightDialog(
                                       context,
                                       gearItem.name,
                                       gearItem.weight,
                                     );
-                                    if (x != null) {
-                                      final (name, weight) = x;
-                                      await dataProvider.gearItemDataProvider
+                                    if (nameWeight != null) {
+                                      final (name, weight) = nameWeight;
+                                      final result = await dataProvider
+                                          .gearItemDataProvider
                                           .update(
                                         gearItem
                                           ..name = name
                                           ..weight = weight,
                                       );
+                                      if (result.isError && context.mounted) {
+                                        await showMessageDialog(
+                                          context,
+                                          "An Error Occurred",
+                                          result.error!.isUniqueViolation
+                                              ? "An item with the same name already exists."
+                                              : result.errorMessage!,
+                                        );
+                                      }
                                     }
                                   },
                                   icon: const Icon(Icons.edit_rounded),
@@ -162,8 +193,18 @@ class GearItemOverview extends StatelessWidget {
                       if (name != null) {
                         final gearCategory =
                             GearCategory(id: GearCategoryId(0), name: name);
-                        await dataProvider.gearCategoryDataProvider
+                        final result = await dataProvider
+                            .gearCategoryDataProvider
                             .create(gearCategory, autoId: true);
+                        if (result.isError && context.mounted) {
+                          await showMessageDialog(
+                            context,
+                            "An Error Occurred",
+                            result.error!.isUniqueViolation
+                                ? "A category with the same name already exists."
+                                : result.errorMessage!,
+                          );
+                        }
                       }
                     },
                     child: const Text("Add Category"),

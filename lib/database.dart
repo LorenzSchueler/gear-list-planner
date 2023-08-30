@@ -109,6 +109,40 @@ abstract final class Columns {
   static const weight = "weight";
 }
 
+class Result<T> {
+  Result.success(T this.success)
+      : error = null,
+        errorMessage = null;
+  Result.error(ErrorType this.error, String this.errorMessage) : success = null;
+
+  static Future<Result<T>> from<T>(Future<T> Function() fn) async {
+    try {
+      return Result.success(await fn());
+    } on DatabaseException catch (e) {
+      return Result.error(
+        e.isUniqueConstraintError()
+            ? ErrorType.uniqueConstraint
+            : ErrorType.unknown,
+        e.toString(),
+      );
+    }
+  }
+
+  final T? success;
+  final ErrorType? error;
+  final String? errorMessage;
+
+  bool get isSuccess => success != null;
+  bool get isError => error != null;
+}
+
+enum ErrorType {
+  uniqueConstraint,
+  unknown;
+
+  bool get isUniqueViolation => this == ErrorType.uniqueConstraint;
+}
+
 abstract class TableAccessor<I extends Id, E extends Entity<I>> {
   static Database get database => AppDatabase.database;
 
@@ -117,20 +151,22 @@ abstract class TableAccessor<I extends Id, E extends Entity<I>> {
 
   String get tableName;
 
-  Future<int> create(E object, bool autoId) async {
+  Future<Result<int>> create(E object, bool autoId) async {
     final record = toDbRecord(object);
     if (autoId) {
       record.remove(Columns.id);
     }
-    return database.insert(tableName, record);
+    return Result.from(() => database.insert(tableName, record));
   }
 
-  Future<void> update(E object) async {
-    await database.update(
-      tableName,
-      toDbRecord(object),
-      where: "${Columns.id} = ?",
-      whereArgs: [object.id.id],
+  Future<Result<void>> update(E object) async {
+    return Result.from(
+      () => database.update(
+        tableName,
+        toDbRecord(object),
+        where: "${Columns.id} = ?",
+        whereArgs: [object.id.id],
+      ),
     );
   }
 

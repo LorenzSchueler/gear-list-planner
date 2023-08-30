@@ -76,8 +76,10 @@ class _GearListDetails extends StatelessWidget {
                         ),
                         if (!gearListVersion.readOnly)
                           _ListItemInput(
-                            onAdd: (gearItemId) {
-                              dataProvider.gearListItemDataProvider.create(
+                            onAdd: (gearItemId) async {
+                              final result = await dataProvider
+                                  .gearListItemDataProvider
+                                  .create(
                                 GearListItem(
                                   id: GearListItemId(0),
                                   gearItemId: gearItemId,
@@ -87,6 +89,15 @@ class _GearListDetails extends StatelessWidget {
                                 ),
                                 autoId: true,
                               );
+                              if (result.isError && context.mounted) {
+                                await showMessageDialog(
+                                  context,
+                                  "An Error Occurred",
+                                  result.error!.isUniqueViolation
+                                      ? "This item is already in this list."
+                                      : result.errorMessage!,
+                                );
+                              }
                             },
                             gearItems:
                                 dataProvider.gearItems[gearCategory.id] ?? [],
@@ -107,22 +118,43 @@ class _GearListDetails extends StatelessWidget {
                                     value: gearListItem.packed,
                                     onChanged: gearListVersion.readOnly
                                         ? null
-                                        : (packed) {
+                                        : (packed) async {
                                             if (packed != null) {
-                                              dataProvider
+                                              final result = await dataProvider
                                                   .gearListItemDataProvider
                                                   .update(
                                                 gearListItem..packed = packed,
                                               );
+                                              if (result.isError &&
+                                                  context.mounted) {
+                                                await showMessageDialog(
+                                                  context,
+                                                  "An Error Occurred",
+                                                  result.errorMessage!,
+                                                );
+                                              }
                                             }
                                           },
                                   ),
                                   IconButton(
-                                    onPressed: gearListVersion.readOnly
+                                    onPressed: gearListVersion.readOnly ||
+                                            gearListItem.count <= 1
                                         ? null
-                                        : () => dataProvider
-                                            .gearListItemDataProvider
-                                            .update(gearListItem..count -= 1),
+                                        : () async {
+                                            final result = await dataProvider
+                                                .gearListItemDataProvider
+                                                .update(
+                                              gearListItem..count -= 1,
+                                            );
+                                            if (result.isError &&
+                                                context.mounted) {
+                                              await showMessageDialog(
+                                                context,
+                                                "An Error Occurred",
+                                                result.errorMessage!,
+                                              );
+                                            }
+                                          },
                                     icon: const Icon(Icons.remove),
                                   ),
                                   Text(
@@ -133,9 +165,21 @@ class _GearListDetails extends StatelessWidget {
                                   IconButton(
                                     onPressed: gearListVersion.readOnly
                                         ? null
-                                        : () => dataProvider
-                                            .gearListItemDataProvider
-                                            .update(gearListItem..count += 1),
+                                        : () async {
+                                            final result = await dataProvider
+                                                .gearListItemDataProvider
+                                                .update(
+                                              gearListItem..count += 1,
+                                            );
+                                            if (result.isError &&
+                                                context.mounted) {
+                                              await showMessageDialog(
+                                                context,
+                                                "An Error Occurred",
+                                                result.errorMessage!,
+                                              );
+                                            }
+                                          },
                                     icon: const Icon(Icons.add),
                                   ),
                                   const SizedBox(width: 10),
@@ -190,8 +234,16 @@ class _GearListDetails extends StatelessWidget {
                           value: gearListVersion.readOnly,
                           onChanged: (readOnly) async {
                             if (readOnly != null) {
-                              await dataProvider.gearListVersionDataProvider
+                              final result = await dataProvider
+                                  .gearListVersionDataProvider
                                   .update(gearListVersion..readOnly = readOnly);
+                              if (result.isError && context.mounted) {
+                                await showMessageDialog(
+                                  context,
+                                  "An Error Occurred",
+                                  result.errorMessage!,
+                                );
+                              }
                             }
                           },
                         ),

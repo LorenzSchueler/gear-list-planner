@@ -12,23 +12,24 @@ abstract class EntityDataProvider<I extends Id, E extends Entity<I>>
     extends ChangeNotifier {
   TableAccessor<I, E> get tableAccessor;
 
-  Future<int> create(
+  Future<Result<int>> create(
     E object, {
     required bool autoId,
     bool notify = true,
   }) async {
-    final id = await tableAccessor.create(object, autoId);
-    if (notify) {
+    final result = await tableAccessor.create(object, autoId);
+    if (result.isSuccess && notify) {
       notifyListeners();
     }
-    return id;
+    return result;
   }
 
-  Future<void> update(E object, {bool notify = true}) async {
-    await tableAccessor.update(object);
-    if (notify) {
+  Future<Result<void>> update(E object, {bool notify = true}) async {
+    final result = await tableAccessor.update(object);
+    if (result.isSuccess && notify) {
       notifyListeners();
     }
+    return result;
   }
 
   Future<void> updateMultiple(List<E> objects, {bool notify = true}) async {
@@ -144,7 +145,7 @@ class GearItemDataProvider extends EntityDataProvider<GearItemId, GearItem> {
   final GearItemAccessor tableAccessor = GearItemAccessor();
 
   @override
-  Future<int> create(
+  Future<Result<int>> create(
     GearItem object, {
     required bool autoId,
     bool autoSortIndex = false,
