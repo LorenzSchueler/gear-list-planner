@@ -55,6 +55,7 @@ class _InitAppWrapperState extends State<InitAppWrapper> {
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue)
             .copyWith(errorContainer: Colors.green),
+        cardTheme: const CardTheme(margin: EdgeInsets.all(10)),
       ),
       home: _progress != null
           ? Center(child: LinearProgressIndicator(value: _progress))
@@ -134,6 +135,7 @@ class _AppState extends State<App> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        elevation: 3,
         title: Row(
           children: [
             const Text("Gear List Planner"),

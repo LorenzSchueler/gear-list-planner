@@ -186,7 +186,7 @@ class GearItemOverview extends StatelessWidget {
               alignment: Alignment.topLeft,
               child: UnconstrainedBox(
                 child: Padding(
-                  padding: const EdgeInsets.all(5),
+                  padding: const EdgeInsets.all(10),
                   child: FilledButton(
                     onPressed: () async {
                       final name = await showNameDialog(context, null);
