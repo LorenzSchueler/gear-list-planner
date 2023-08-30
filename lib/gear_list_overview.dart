@@ -38,7 +38,7 @@ class GearListOverview extends StatelessWidget {
                         children: [
                           Text(
                             gearList.name,
-                            style: Theme.of(context).textTheme.headlineMedium,
+                            style: Theme.of(context).textTheme.titleLarge,
                           ),
                           const Spacer(),
                           IconButton(
@@ -132,7 +132,7 @@ class GearListOverview extends StatelessWidget {
                               children: [
                                 Text(
                                   gearListVersion.name,
-                                  style: Theme.of(context).textTheme.titleLarge,
+                                  style: Theme.of(context).textTheme.bodyLarge,
                                 ),
                                 const Spacer(),
                                 IconButton(

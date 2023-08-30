@@ -139,7 +139,10 @@ class _AppState extends State<App> with TickerProviderStateMixin {
         elevation: 3,
         title: Row(
           children: [
-            const Text("Gear List Planner"),
+            Text(
+              "Gear List Planner",
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
             const Spacer(),
             FilledButton.icon(
               onPressed: () async {

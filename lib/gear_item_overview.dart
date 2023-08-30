@@ -28,7 +28,7 @@ class GearItemOverview extends StatelessWidget {
                         children: [
                           Text(
                             gearCategory.name,
-                            style: Theme.of(context).textTheme.headlineMedium,
+                            style: Theme.of(context).textTheme.titleLarge,
                           ),
                           const Spacer(),
                           IconButton(
@@ -125,7 +125,7 @@ class GearItemOverview extends StatelessWidget {
                                 const Spacer(),
                                 Text(
                                   gearItem.weight.toString(),
-                                  style: Theme.of(context).textTheme.titleLarge,
+                                  style: Theme.of(context).textTheme.bodyLarge,
                                 ),
                                 IconButton(
                                   onPressed: () async {

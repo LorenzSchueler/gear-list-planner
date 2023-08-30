@@ -63,7 +63,7 @@ class _GearListCompare extends StatelessWidget {
                       children: [
                         Text(
                           gearCategory.name,
-                          style: Theme.of(context).textTheme.headlineMedium,
+                          style: Theme.of(context).textTheme.titleLarge,
                         ),
                         Expanded(
                           child: ListView.builder(
@@ -79,7 +79,7 @@ class _GearListCompare extends StatelessWidget {
                                   Text(
                                     "${gearListItem.$1?.count ?? 0} - ${gearListItem.$2?.count ?? 0}",
                                     style:
-                                        Theme.of(context).textTheme.titleLarge,
+                                        Theme.of(context).textTheme.bodyLarge,
                                   ),
                                   const SizedBox(width: 10),
                                   Column(
@@ -100,7 +100,7 @@ class _GearListCompare extends StatelessWidget {
                                   Text(
                                     "${(gearListItemsAndItem.weight1 / 1000).toStringAsFixed(3)} - ${(gearListItemsAndItem.weight2 / 1000).toStringAsFixed(3)}",
                                     style:
-                                        Theme.of(context).textTheme.titleLarge,
+                                        Theme.of(context).textTheme.bodyLarge,
                                   ),
                                 ],
                               );
@@ -111,7 +111,7 @@ class _GearListCompare extends StatelessWidget {
                           width: double.infinity,
                           child: Text(
                             "${(gearListItemsAndItems.weight1 / 1000).toStringAsFixed(3)} - ${(gearListItemsAndItems.weight2 / 1000).toStringAsFixed(3)} kg",
-                            style: Theme.of(context).textTheme.headlineMedium,
+                            style: Theme.of(context).textTheme.titleLarge,
                             textAlign: TextAlign.end,
                           ),
                         ),
@@ -123,14 +123,15 @@ class _GearListCompare extends StatelessWidget {
             ),
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.all(15),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Text(
                       "Total: ${(categoriesWithItems.weight1 / 1000).toStringAsFixed(3)} - ${(categoriesWithItems.weight2 / 1000).toStringAsFixed(3)} kg",
-                      style: Theme.of(context).textTheme.headlineMedium,
+                      style: Theme.of(context).textTheme.titleLarge,
                     ),
                   ],
                 ),

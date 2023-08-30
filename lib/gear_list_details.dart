@@ -72,7 +72,7 @@ class _GearListDetails extends StatelessWidget {
                       children: [
                         Text(
                           gearCategory.name,
-                          style: Theme.of(context).textTheme.headlineMedium,
+                          style: Theme.of(context).textTheme.titleLarge,
                         ),
                         if (!gearListVersion.readOnly)
                           _ListItemInput(
@@ -160,7 +160,7 @@ class _GearListDetails extends StatelessWidget {
                                   Text(
                                     gearListItem.count.toString(),
                                     style:
-                                        Theme.of(context).textTheme.titleLarge,
+                                        Theme.of(context).textTheme.bodyLarge,
                                   ),
                                   IconButton(
                                     onPressed: gearListVersion.readOnly
@@ -202,7 +202,7 @@ class _GearListDetails extends StatelessWidget {
                                     (gearListItemsAndItem.weight / 1000)
                                         .toStringAsFixed(3),
                                     style:
-                                        Theme.of(context).textTheme.titleLarge,
+                                        Theme.of(context).textTheme.bodyLarge,
                                   ),
                                   IconButton(
                                     onPressed: gearListVersion.readOnly
@@ -221,7 +221,7 @@ class _GearListDetails extends StatelessWidget {
                           width: double.infinity,
                           child: Text(
                             "${(gearListItemsAndItems.weight / 1000).toStringAsFixed(3)} kg",
-                            style: Theme.of(context).textTheme.headlineMedium,
+                            style: Theme.of(context).textTheme.titleLarge,
                             textAlign: TextAlign.end,
                           ),
                         ),
@@ -312,7 +312,7 @@ class _GearListDetails extends StatelessWidget {
                       ),
                       Text(
                         "Total: ${(categoriesWithItems.weight / 1000).toStringAsFixed(3)} kg",
-                        style: Theme.of(context).textTheme.headlineMedium,
+                        style: Theme.of(context).textTheme.titleLarge,
                       ),
                     ],
                   ),
