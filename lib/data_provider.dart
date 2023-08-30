@@ -7,6 +7,8 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:gear_list_planner/database.dart';
 import 'package:gear_list_planner/model.dart';
+import 'package:gear_list_planner/result.dart';
+import 'package:gear_list_planner/table_accessors.dart';
 
 abstract class EntityDataProvider<I extends Id, E extends Entity<I>>
     extends ChangeNotifier {

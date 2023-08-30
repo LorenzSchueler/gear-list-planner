@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:gear_list_planner/data_provider.dart';
-import 'package:gear_list_planner/database.dart';
 import 'package:gear_list_planner/dialog.dart';
 import 'package:gear_list_planner/model.dart';
+import 'package:gear_list_planner/result.dart';
 import 'package:provider/provider.dart';
 
 class GearListOverview extends StatelessWidget {
