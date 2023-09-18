@@ -337,15 +337,20 @@ class _ListItemInput extends StatefulWidget {
 class _ListItemInputState extends State<_ListItemInput> {
   GearItemId? _gearItemId;
 
+  final focusNode = FocusNode();
+
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
+        // TODO workaround because DropdownMenu has no FocusNode
+        SizedBox(
+          width: 1,
+          child: TextFormField(focusNode: focusNode),
+        ),
         DropdownMenu(
           dropdownMenuEntries: widget.gearItems
-              .map(
-                (i) => DropdownMenuEntry<GearItem>(value: i, label: i.name),
-              )
+              .map((i) => DropdownMenuEntry(value: i, label: i.name))
               .toList(),
           inputDecorationTheme:
               const InputDecorationTheme(contentPadding: EdgeInsets.zero),
@@ -363,6 +368,9 @@ class _ListItemInputState extends State<_ListItemInput> {
             if (_gearItemId != null) {
               widget.onAdd(_gearItemId!);
             }
+            focusNode
+              ..requestFocus()
+              ..nextFocus(); // TODO workaround because DropdownMenu has no FocusNode
           },
           icon: const Icon(Icons.add),
         ),
