@@ -301,4 +301,12 @@ class GearCategoryAccessor extends TableAccessor<GearCategoryId, GearCategory> {
 
   @override
   String tableName = Tables.gearCategory;
+
+  Future<int> getMaxSortIndex() async {
+    final id = await TableAccessor.database.query(
+      Tables.gearCategory,
+      columns: ["max(${Columns.sortIndex}) as max_sort_index"],
+    );
+    return id.single["max_sort_index"] as int? ?? -1;
+  }
 }

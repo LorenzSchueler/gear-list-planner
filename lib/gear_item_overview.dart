@@ -72,16 +72,17 @@ class GearItemOverview extends StatelessWidget {
                       ),
                       _ItemInput(
                         onAdd: (type, name, weight) async {
+                          final gearItem = GearItem(
+                            id: GearItemId(0),
+                            gearCategoryId: gearCategory.id,
+                            name: name,
+                            type: type,
+                            weight: weight,
+                            sortIndex: 0,
+                          );
                           final result =
                               await dataProvider.gearItemDataProvider.create(
-                            GearItem(
-                              id: GearItemId(0),
-                              gearCategoryId: gearCategory.id,
-                              name: name,
-                              type: type,
-                              weight: weight,
-                              sortIndex: 0,
-                            ),
+                            gearItem,
                             autoId: true,
                             autoSortIndex: true,
                           );
@@ -203,11 +204,17 @@ class GearItemOverview extends StatelessWidget {
                     onPressed: () async {
                       final name = await showNameDialog(context, null);
                       if (name != null) {
-                        final gearCategory =
-                            GearCategory(id: GearCategoryId(0), name: name);
-                        final result = await dataProvider
-                            .gearCategoryDataProvider
-                            .create(gearCategory, autoId: true);
+                        final gearCategory = GearCategory(
+                          id: GearCategoryId(0),
+                          name: name,
+                          sortIndex: 0,
+                        );
+                        final result =
+                            await dataProvider.gearCategoryDataProvider.create(
+                          gearCategory,
+                          autoId: true,
+                          autoSortIndex: true,
+                        );
                         if (result.isError && context.mounted) {
                           await showMessageDialog(
                             context,

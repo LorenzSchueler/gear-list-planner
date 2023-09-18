@@ -58,12 +58,14 @@ Map<String, dynamic> _$GearItemToJson(GearItem instance) => <String, dynamic>{
 GearCategory _$GearCategoryFromJson(Map<String, dynamic> json) => GearCategory(
       id: GearCategoryId(json['id'] as int),
       name: json['name'] as String,
+      sortIndex: json['sort_index'] as int,
     );
 
 Map<String, dynamic> _$GearCategoryToJson(GearCategory instance) =>
     <String, dynamic>{
       'id': Id._toJson(instance.id),
       'name': instance.name,
+      'sort_index': instance.sortIndex,
     };
 
 GearModel _$GearModelFromJson(Map<String, dynamic> json) => GearModel(

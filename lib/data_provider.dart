@@ -163,7 +163,19 @@ class GearCategoryDataProvider
   static final _instance = GearCategoryDataProvider._();
 
   @override
-  final tableAccessor = GearCategoryAccessor();
+  final GearCategoryAccessor tableAccessor = GearCategoryAccessor();
+
+  @override
+  Future<Result<int>> create(
+    GearCategory object, {
+    required bool autoId,
+    bool autoSortIndex = false,
+    bool notify = true,
+  }) async {
+    final maxSortIndex = await tableAccessor.getMaxSortIndex();
+    object.sortIndex = maxSortIndex + 1;
+    return super.create(object, autoId: autoId, notify: notify);
+  }
 }
 
 class ModelDataProvider extends ChangeNotifier {

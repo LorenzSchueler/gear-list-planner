@@ -51,6 +51,7 @@ abstract final class AppDatabase {
           [
             Column.idColumn(),
             Column.stringColumn(Columns.name),
+            Column.intColumn(Columns.sortIndex),
           ],
           [Columns.name],
         );

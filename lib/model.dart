@@ -177,7 +177,7 @@ class GearCategoryId implements Id {
 
 @JsonSerializable()
 class GearCategory extends Entity<GearCategoryId> {
-  GearCategory({required this.id, required this.name});
+  GearCategory({required this.id, required this.name, required this.sortIndex});
 
   factory GearCategory.fromJson(Map<String, dynamic> json) =>
       _$GearCategoryFromJson(json);
@@ -189,6 +189,7 @@ class GearCategory extends Entity<GearCategoryId> {
   @JsonKey(fromJson: GearCategoryId.new, toJson: Id._toJson)
   final GearCategoryId id;
   String name;
+  int sortIndex;
 
   @override
   String toString() => id.toString();
