@@ -42,15 +42,14 @@ class GearListOverview extends StatelessWidget {
                         cloneListId,
                       );
                     } else {
-                      result = await dataProvider.gearListDataProvider.create(
-                        GearList(
-                          id: GearListId(0),
-                          name: name,
-                          notes: "",
-                          readOnly: false,
-                        ),
-                        autoId: true,
+                      final gearList = GearList(
+                        id: GearListId(0),
+                        name: name,
+                        notes: "",
+                        readOnly: false,
                       );
+                      result = await dataProvider.gearListDataProvider
+                          .create(gearList, autoId: true);
                     }
                     if (result.isError && context.mounted) {
                       await showMessageDialog(

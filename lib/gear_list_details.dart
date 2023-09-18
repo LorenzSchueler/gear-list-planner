@@ -76,18 +76,16 @@ class _GearListDetails extends StatelessWidget {
                         if (!gearList.readOnly) ...[
                           _ListItemInput(
                             onAdd: (gearItemId) async {
+                              final gearListItem = GearListItem(
+                                id: GearListItemId(0),
+                                gearItemId: gearItemId,
+                                gearListId: gearList.id,
+                                count: 1,
+                                packed: false,
+                              );
                               final result = await dataProvider
                                   .gearListItemDataProvider
-                                  .create(
-                                GearListItem(
-                                  id: GearListItemId(0),
-                                  gearItemId: gearItemId,
-                                  gearListId: gearList.id,
-                                  count: 1,
-                                  packed: false,
-                                ),
-                                autoId: true,
-                              );
+                                  .create(gearListItem, autoId: true);
                               if (result.isError && context.mounted) {
                                 await showMessageDialog(
                                   context,

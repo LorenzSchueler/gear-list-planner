@@ -139,7 +139,6 @@ class GearItemDataProvider extends EntityDataProvider<GearItemId, GearItem> {
   Future<Result<int>> create(
     GearItem object, {
     required bool autoId,
-    bool autoSortIndex = false,
     bool notify = true,
   }) async {
     final maxSortIndex =
@@ -169,7 +168,6 @@ class GearCategoryDataProvider
   Future<Result<int>> create(
     GearCategory object, {
     required bool autoId,
-    bool autoSortIndex = false,
     bool notify = true,
   }) async {
     final maxSortIndex = await tableAccessor.getMaxSortIndex();

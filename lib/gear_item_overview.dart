@@ -84,7 +84,6 @@ class GearItemOverview extends StatelessWidget {
                               await dataProvider.gearItemDataProvider.create(
                             gearItem,
                             autoId: true,
-                            autoSortIndex: true,
                           );
                           if (result.isError && context.mounted) {
                             await showMessageDialog(
@@ -213,7 +212,6 @@ class GearItemOverview extends StatelessWidget {
                             await dataProvider.gearCategoryDataProvider.create(
                           gearCategory,
                           autoId: true,
-                          autoSortIndex: true,
                         );
                         if (result.isError && context.mounted) {
                           await showMessageDialog(
