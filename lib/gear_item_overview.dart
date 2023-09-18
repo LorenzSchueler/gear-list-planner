@@ -243,6 +243,7 @@ class _ItemInput extends StatefulWidget {
 class _ItemInputState extends State<_ItemInput> {
   final _formKey = GlobalKey<FormState>();
 
+  final typeFocus = FocusNode();
   final typeController = TextEditingController();
   final nameController = TextEditingController();
   final weightController = TextEditingController();
@@ -259,14 +260,11 @@ class _ItemInputState extends State<_ItemInput> {
           Expanded(
             child: TextFormField(
               controller: typeController,
+              focusNode: typeFocus,
               decoration: const InputDecoration(labelText: "Type"),
               onChanged: (type) => setState(() => _type = type),
-              validator: (type) {
-                if (type == null || type.isEmpty) {
-                  return 'please enter a type';
-                }
-                return null;
-              },
+              validator: (type) =>
+                  type == null || type.isEmpty ? 'please enter a type' : null,
             ),
           ),
           const SizedBox(width: 10),
@@ -275,12 +273,8 @@ class _ItemInputState extends State<_ItemInput> {
               controller: nameController,
               decoration: const InputDecoration(labelText: "Name"),
               onChanged: (name) => setState(() => _name = name),
-              validator: (name) {
-                if (name == null || name.isEmpty) {
-                  return 'please enter a name';
-                }
-                return null;
-              },
+              validator: (name) =>
+                  name == null || name.isEmpty ? 'please enter a name' : null,
             ),
           ),
           const SizedBox(width: 10),
@@ -295,22 +289,21 @@ class _ItemInputState extends State<_ItemInput> {
                   setState(() => _weight = weight);
                 }
               },
-              validator: (weight) {
-                if (weight == null || weight.isEmpty) {
-                  return 'please enter a weight';
-                } else if (int.tryParse(weight) == null) {
-                  return "not a valid weight";
-                }
-                return null;
-              },
+              validator: (weight) => weight == null || weight.isEmpty
+                  ? 'please enter a weight'
+                  : int.tryParse(weight) == null
+                      ? "not a valid weight"
+                      : null,
             ),
           ),
           IconButton(
             onPressed: () {
               if (_formKey.currentState?.validate() ?? false) {
                 widget.onAdd(_type, _name, _weight);
+                typeController.text = "";
                 nameController.text = "";
                 weightController.text = "";
+                typeFocus.requestFocus();
               }
             },
             icon: const Icon(Icons.add),
