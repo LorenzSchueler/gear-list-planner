@@ -13,12 +13,13 @@ class GearItemOverview extends StatelessWidget {
       builder: (context, dataProvider, _) => CustomScrollView(
         scrollDirection: Axis.horizontal,
         slivers: [
-          SliverList.builder(
+          SliverReorderableList(
             itemCount: dataProvider.gearCategoriesWithItems.length,
             itemBuilder: (context, index) {
               final (gearCategory, gearItems) =
                   dataProvider.gearCategoriesWithItems[index];
               return Card(
+                key: ValueKey(index),
                 child: Container(
                   width: 350,
                   padding: const EdgeInsets.all(10),
@@ -26,6 +27,11 @@ class GearItemOverview extends StatelessWidget {
                     children: [
                       Row(
                         children: [
+                          ReorderableDragStartListener(
+                            index: index,
+                            child: const Icon(Icons.drag_handle_rounded),
+                          ),
+                          const SizedBox(width: 10),
                           Text(
                             gearCategory.name,
                             style: Theme.of(context).textTheme.titleLarge,
@@ -192,6 +198,7 @@ class GearItemOverview extends StatelessWidget {
                 ),
               );
             },
+            onReorder: dataProvider.reorderGearCategory,
           ),
           SliverToBoxAdapter(
             child: Align(

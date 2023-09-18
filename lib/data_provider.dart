@@ -354,6 +354,21 @@ class GearItemOverviewDataProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> reorderGearCategory(int oldIndex, int newIndex) async {
+    final all = await gearCategoryDataProvider.getAll();
+
+    if (oldIndex < newIndex - 1) {
+      final item = all.removeAt(oldIndex);
+      all.insert(newIndex - 1, item);
+    } else if (oldIndex > newIndex) {
+      all.insert(newIndex, all.removeAt(oldIndex));
+    }
+
+    all.forEachIndexed((index, item) => item..sortIndex = index);
+
+    await gearCategoryDataProvider.updateMultiple(all);
+  }
+
   Future<void> reorderGearItem(
     GearCategoryId gearCategoryId,
     int oldIndex,

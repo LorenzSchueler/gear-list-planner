@@ -302,6 +302,13 @@ class GearCategoryAccessor extends TableAccessor<GearCategoryId, GearCategory> {
   @override
   String tableName = Tables.gearCategory;
 
+  @override
+  Future<List<GearCategory>> getAll() async {
+    final data = await TableAccessor.database
+        .query(tableName, orderBy: Columns.sortIndex);
+    return data.map(fromDbRecord).toList();
+  }
+
   Future<int> getMaxSortIndex() async {
     final id = await TableAccessor.database.query(
       Tables.gearCategory,
