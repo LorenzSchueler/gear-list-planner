@@ -72,6 +72,8 @@ class _GearListDetails extends StatelessWidget {
                         Text(
                           gearCategory.name,
                           style: Theme.of(context).textTheme.titleLarge,
+                          softWrap: false,
+                          overflow: TextOverflow.ellipsis,
                         ),
                         if (!gearList.readOnly) ...[
                           _ListItemInput(
@@ -99,7 +101,7 @@ class _GearListDetails extends StatelessWidget {
                             gearItems:
                                 dataProvider.gearItems[gearCategory.id] ?? [],
                           ),
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 10),
                         ],
                         Expanded(
                           child: ListView.builder(
@@ -181,21 +183,28 @@ class _GearListDetails extends StatelessWidget {
                                     icon: const Icon(Icons.add),
                                   ),
                                   const SizedBox(width: 10),
-                                  Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        gearItem.type,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodyLarge,
-                                      ),
-                                      Text(gearItem.name),
-                                    ],
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          gearItem.type,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyLarge,
+                                          softWrap: false,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        Text(
+                                          gearItem.name,
+                                          softWrap: false,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                  const Spacer(),
+                                  const SizedBox(width: 5),
                                   Text(
                                     (gearListItemsAndItem.weight / 1000)
                                         .toStringAsFixed(3),
@@ -348,21 +357,22 @@ class _ListItemInputState extends State<_ListItemInput> {
           width: 1,
           child: TextFormField(focusNode: focusNode),
         ),
-        DropdownMenu(
-          dropdownMenuEntries: widget.gearItems
-              .map((i) => DropdownMenuEntry(value: i, label: i.name))
-              .toList(),
-          inputDecorationTheme:
-              const InputDecorationTheme(contentPadding: EdgeInsets.zero),
-          enableFilter: true,
-          label: const Text("Name"),
-          onSelected: (gearItem) {
-            if (gearItem != null) {
-              setState(() => _gearItemId = gearItem.id);
-            }
-          },
+        Expanded(
+          child: DropdownMenu(
+            dropdownMenuEntries: widget.gearItems
+                .map((i) => DropdownMenuEntry(value: i, label: i.name))
+                .toList(),
+            inputDecorationTheme:
+                const InputDecorationTheme(contentPadding: EdgeInsets.zero),
+            enableFilter: true,
+            label: const Text("Name"),
+            onSelected: (gearItem) {
+              if (gearItem != null) {
+                setState(() => _gearItemId = gearItem.id);
+              }
+            },
+          ),
         ),
-        const Spacer(),
         IconButton(
           onPressed: () {
             if (_gearItemId != null) {

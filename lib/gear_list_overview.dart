@@ -72,11 +72,14 @@ class GearListOverview extends StatelessWidget {
                     final gearList = dataProvider.gearLists[index];
                     return Row(
                       children: [
-                        Text(
-                          gearList.name,
-                          style: Theme.of(context).textTheme.bodyLarge,
+                        Expanded(
+                          child: Text(
+                            gearList.name,
+                            style: Theme.of(context).textTheme.bodyLarge,
+                            softWrap: false,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
-                        const Spacer(),
                         IconButton(
                           onPressed: () => onSelectGearList(
                             gearList,

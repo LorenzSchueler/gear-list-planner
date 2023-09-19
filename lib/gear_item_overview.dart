@@ -32,11 +32,14 @@ class GearItemOverview extends StatelessWidget {
                             child: const Icon(Icons.drag_handle_rounded),
                           ),
                           const SizedBox(width: 10),
-                          Text(
-                            gearCategory.name,
-                            style: Theme.of(context).textTheme.titleLarge,
+                          Expanded(
+                            child: Text(
+                              gearCategory.name,
+                              style: Theme.of(context).textTheme.titleLarge,
+                              softWrap: false,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
-                          const Spacer(),
                           IconButton(
                             onPressed: () async {
                               final name = await showNameDialog(
@@ -86,11 +89,8 @@ class GearItemOverview extends StatelessWidget {
                             weight: weight,
                             sortIndex: 0,
                           );
-                          final result =
-                              await dataProvider.gearItemDataProvider.create(
-                            gearItem,
-                            autoId: true,
-                          );
+                          final result = await dataProvider.gearItemDataProvider
+                              .create(gearItem, autoId: true);
                           if (result.isError && context.mounted) {
                             await showMessageDialog(
                               context,
@@ -116,19 +116,28 @@ class GearItemOverview extends StatelessWidget {
                                   child: const Icon(Icons.drag_handle_rounded),
                                 ),
                                 const SizedBox(width: 10),
-                                Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      gearItem.type,
-                                      style:
-                                          Theme.of(context).textTheme.bodyLarge,
-                                    ),
-                                    Text(gearItem.name),
-                                  ],
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        gearItem.type,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyLarge,
+                                        softWrap: false,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      Text(
+                                        gearItem.name,
+                                        softWrap: false,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                                const Spacer(),
+                                const SizedBox(width: 5),
                                 Text(
                                   gearItem.weight.toString(),
                                   style: Theme.of(context).textTheme.bodyLarge,
@@ -215,11 +224,9 @@ class GearItemOverview extends StatelessWidget {
                           name: name,
                           sortIndex: 0,
                         );
-                        final result =
-                            await dataProvider.gearCategoryDataProvider.create(
-                          gearCategory,
-                          autoId: true,
-                        );
+                        final result = await dataProvider
+                            .gearCategoryDataProvider
+                            .create(gearCategory, autoId: true);
                         if (result.isError && context.mounted) {
                           await showMessageDialog(
                             context,
@@ -256,9 +263,6 @@ class _ItemInputState extends State<_ItemInput> {
   final _formKey = GlobalKey<FormState>();
 
   final typeFocus = FocusNode();
-  final typeController = TextEditingController();
-  final nameController = TextEditingController();
-  final weightController = TextEditingController();
   String _type = "";
   String _name = "";
   int _weight = 0;
@@ -271,7 +275,6 @@ class _ItemInputState extends State<_ItemInput> {
         children: [
           Expanded(
             child: TextFormField(
-              controller: typeController,
               focusNode: typeFocus,
               decoration: const InputDecoration(labelText: "Type"),
               onChanged: (type) => setState(() => _type = type),
@@ -282,7 +285,6 @@ class _ItemInputState extends State<_ItemInput> {
           const SizedBox(width: 10),
           Expanded(
             child: TextFormField(
-              controller: nameController,
               decoration: const InputDecoration(labelText: "Name"),
               onChanged: (name) => setState(() => _name = name),
               validator: (name) =>
@@ -292,7 +294,6 @@ class _ItemInputState extends State<_ItemInput> {
           const SizedBox(width: 10),
           Expanded(
             child: TextFormField(
-              controller: weightController,
               decoration: const InputDecoration(labelText: "Weight"),
               keyboardType: TextInputType.number,
               onChanged: (value) {
@@ -312,9 +313,7 @@ class _ItemInputState extends State<_ItemInput> {
             onPressed: () {
               if (_formKey.currentState?.validate() ?? false) {
                 widget.onAdd(_type, _name, _weight);
-                typeController.text = "";
-                nameController.text = "";
-                weightController.text = "";
+                _formKey.currentState?.reset();
                 typeFocus.requestFocus();
               }
             },

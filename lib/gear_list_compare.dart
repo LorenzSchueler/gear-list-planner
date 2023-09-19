@@ -63,6 +63,8 @@ class _GearListCompare extends StatelessWidget {
                         Text(
                           gearCategory.name,
                           style: Theme.of(context).textTheme.titleLarge,
+                          softWrap: false,
+                          overflow: TextOverflow.ellipsis,
                         ),
                         Expanded(
                           child: ListView.builder(
@@ -81,21 +83,29 @@ class _GearListCompare extends StatelessWidget {
                                         Theme.of(context).textTheme.bodyLarge,
                                   ),
                                   const SizedBox(width: 10),
-                                  Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        gearItem.type,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodyLarge,
-                                      ),
-                                      Text(gearItem.name),
-                                    ],
+                                  Expanded(
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          gearItem.type,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyLarge,
+                                          softWrap: false,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        Text(
+                                          gearItem.name,
+                                          softWrap: false,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                  const Spacer(),
+                                  const SizedBox(width: 5),
                                   Text(
                                     "${(gearListItemsAndItem.weight1 / 1000).toStringAsFixed(3)} - ${(gearListItemsAndItem.weight2 / 1000).toStringAsFixed(3)}",
                                     style:
