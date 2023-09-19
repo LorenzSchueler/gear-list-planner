@@ -39,8 +39,7 @@ class _GearListCompare extends StatelessWidget {
 
   final GearListCompareDataProvider dataProvider;
   final (GearList, GearList) gearLists;
-  final List<(GearCategory, List<((GearListItem?, GearListItem?), GearItem)>)>
-      categoriesWithItems;
+  final List<GearCategoryWithCompareItems> categoriesWithItems;
 
   @override
   Widget build(BuildContext context) {
@@ -53,8 +52,10 @@ class _GearListCompare extends StatelessWidget {
             SliverList.builder(
               itemCount: categoriesWithItems.length,
               itemBuilder: (context, index) {
-                final (gearCategory, gearListItemsAndItems) =
-                    categoriesWithItems[index];
+                final gearCategoryWithCompareItems = categoriesWithItems[index];
+                final gearCategory = gearCategoryWithCompareItems.gearCategory;
+                final selectedItems =
+                    gearCategoryWithCompareItems.selectedItems;
                 return Card(
                   child: Container(
                     width: 400,
@@ -67,17 +68,14 @@ class _GearListCompare extends StatelessWidget {
                         ),
                         Expanded(
                           child: ListView.builder(
-                            itemCount: gearListItemsAndItems.length,
+                            itemCount: selectedItems.length,
                             itemBuilder: (context, index) {
-                              final gearListItemsAndItem =
-                                  gearListItemsAndItems[index];
-                              final (gearListItem, gearItem) =
-                                  gearListItemsAndItem;
+                              final compareItem = selectedItems[index];
                               return Row(
                                 key: ValueKey(index),
                                 children: [
                                   Text(
-                                    "${gearListItem.$1?.count ?? 0} - ${gearListItem.$2?.count ?? 0}",
+                                    "${compareItem.gearListItem1?.count ?? 0} - ${compareItem.gearListItem2?.count ?? 0}",
                                     style:
                                         Theme.of(context).textTheme.bodyLarge,
                                   ),
@@ -89,20 +87,20 @@ class _GearListCompare extends StatelessWidget {
                                           CrossAxisAlignment.start,
                                       children: [
                                         HoverScrollingText(
-                                          gearItem.type,
+                                          compareItem.gearItem.type,
                                           style: Theme.of(context)
                                               .textTheme
                                               .bodyLarge,
                                         ),
                                         HoverScrollingText(
-                                          gearItem.name,
+                                          compareItem.gearItem.name,
                                         ),
                                       ],
                                     ),
                                   ),
                                   const SizedBox(width: 5),
                                   Text(
-                                    "${(gearListItemsAndItem.weight1 / 1000).toStringAsFixed(3)} - ${(gearListItemsAndItem.weight2 / 1000).toStringAsFixed(3)}",
+                                    "${(compareItem.weight1 / 1000).toStringAsFixed(3)} - ${(compareItem.weight2 / 1000).toStringAsFixed(3)}",
                                     style:
                                         Theme.of(context).textTheme.bodyLarge,
                                   ),
@@ -114,7 +112,7 @@ class _GearListCompare extends StatelessWidget {
                         SizedBox(
                           width: double.infinity,
                           child: Text(
-                            "${(gearListItemsAndItems.weight1 / 1000).toStringAsFixed(3)} - ${(gearListItemsAndItems.weight2 / 1000).toStringAsFixed(3)} kg",
+                            "${(selectedItems.weight1 / 1000).toStringAsFixed(3)} - ${(selectedItems.weight2 / 1000).toStringAsFixed(3)} kg",
                             style: Theme.of(context).textTheme.titleLarge,
                             textAlign: TextAlign.end,
                           ),

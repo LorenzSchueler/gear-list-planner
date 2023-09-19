@@ -1,3 +1,4 @@
+import 'package:gear_list_planner/data_provider.dart';
 import 'package:gear_list_planner/database.dart';
 import 'package:gear_list_planner/model.dart';
 import 'package:gear_list_planner/result.dart';
@@ -155,8 +156,7 @@ class GearListItemAccessor extends TableAccessor<GearListItemId, GearListItem> {
     }).toList();
   }
 
-  Future<List<((GearListItem?, GearListItem?), GearItem)>>
-      getWithItemByListsAndCategory(
+  Future<List<CompareItem>> getWithItemByListsAndCategory(
     (GearListId, GearListId) gearListIds,
     GearCategoryId gearCategoryId,
   ) async {
@@ -254,9 +254,11 @@ class GearListItemAccessor extends TableAccessor<GearListItemId, GearListItem> {
                   ),
             ),
           );
-          return ((gearListItem1, gearListItem2), gearItem);
+          return CompareItem(gearItem, gearListItem1, gearListItem2);
         })
-        .where((item) => item.$1.$1 != null || item.$1.$2 != null)
+        .where(
+          (item) => item.gearListItem1 != null || item.gearListItem2 != null,
+        )
         .toList();
   }
 }
