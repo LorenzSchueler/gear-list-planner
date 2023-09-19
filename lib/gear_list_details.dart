@@ -342,6 +342,7 @@ class _ListItemInputState extends State<_ListItemInput> {
   GearItemId? _gearItemId;
 
   final focusNode = FocusNode();
+  final dropdownTextController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -354,6 +355,7 @@ class _ListItemInputState extends State<_ListItemInput> {
         ),
         Expanded(
           child: DropdownMenu(
+            controller: dropdownTextController,
             dropdownMenuEntries: widget.gearItems
                 .map(
                   (i) => DropdownMenuEntry(
@@ -379,6 +381,7 @@ class _ListItemInputState extends State<_ListItemInput> {
             if (_gearItemId != null) {
               widget.onAdd(_gearItemId!);
             }
+            dropdownTextController.text = "";
             focusNode
               ..requestFocus()
               ..nextFocus(); // TODO workaround because DropdownMenu has no FocusNode
