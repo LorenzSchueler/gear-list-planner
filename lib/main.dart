@@ -211,8 +211,12 @@ class _AppState extends State<App> with TickerProviderStateMixin {
                 gearListId: _gearList!.id,
               )
             : const Center(
-                child: Text(
-                  "No list selected. Select a list in the list overview.",
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text("Select a list in the list overview by clicking on "),
+                    Icon(Icons.open_in_new),
+                  ],
                 ),
               ),
         Tab.listCompare => showCompare
@@ -220,8 +224,14 @@ class _AppState extends State<App> with TickerProviderStateMixin {
                 gearListIds: (_gearListCompare.$1!.id, _gearListCompare.$2!.id),
               )
             : const Center(
-                child: Text(
-                  "No lists selected for comparison. Select two lists in the list overview.",
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Select two lists for comparison in the list overview by clicking on ",
+                    ),
+                    Icon(Icons.compare_rounded),
+                  ],
                 ),
               ),
       },
