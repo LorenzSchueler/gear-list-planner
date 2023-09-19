@@ -366,14 +366,9 @@ class GearItemOverviewDataProvider extends ChangeNotifier {
   Future<void> reorderGearCategory(int oldIndex, int newIndex) async {
     final all = await gearCategoryDataProvider.getAll();
 
-    if (oldIndex < newIndex - 1) {
-      final item = all.removeAt(oldIndex);
-      all.insert(newIndex - 1, item);
-    } else if (oldIndex > newIndex) {
-      all.insert(newIndex, all.removeAt(oldIndex));
-    }
-
-    all.forEachIndexed((index, item) => item..sortIndex = index);
+    all
+      ..reorder(oldIndex, newIndex)
+      ..forEachIndexed((index, item) => item..sortIndex = index);
 
     await gearCategoryDataProvider.updateMultiple(all);
   }
@@ -385,14 +380,9 @@ class GearItemOverviewDataProvider extends ChangeNotifier {
   ) async {
     final all = await gearItemDataProvider.getByGearCategoryId(gearCategoryId);
 
-    if (oldIndex < newIndex - 1) {
-      final item = all.removeAt(oldIndex);
-      all.insert(newIndex - 1, item);
-    } else if (oldIndex > newIndex) {
-      all.insert(newIndex, all.removeAt(oldIndex));
-    }
-
-    all.forEachIndexed((index, item) => item..sortIndex = index);
+    all
+      ..reorder(oldIndex, newIndex)
+      ..forEachIndexed((index, item) => item..sortIndex = index);
 
     await gearItemDataProvider.updateMultiple(all);
   }
@@ -566,6 +556,17 @@ class GearListCompareDataProvider extends ChangeNotifier {
     _gearItemsForList = ((gearList1, gearList2), categoriesWithItems);
 
     notifyListeners();
+  }
+}
+
+extension<T> on List<T> {
+  void reorder(int oldIndex, int newIndex) {
+    if (oldIndex < newIndex - 1) {
+      final item = removeAt(oldIndex);
+      insert(newIndex - 1, item);
+    } else if (oldIndex > newIndex) {
+      insert(newIndex, removeAt(oldIndex));
+    }
   }
 }
 
