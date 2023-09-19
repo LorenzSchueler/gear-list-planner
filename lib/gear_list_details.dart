@@ -40,8 +40,7 @@ class _GearListDetails extends StatelessWidget {
 
   final GearListDetailsDataProvider dataProvider;
   final GearList gearList;
-  final List<(GearCategory, List<(GearListItem, GearItem)>)>
-      categoriesWithItems;
+  final List<GearCategoryWithItems> categoriesWithItems;
 
   @override
   Widget build(BuildContext context) {
@@ -54,16 +53,18 @@ class _GearListDetails extends StatelessWidget {
             SliverList.builder(
               itemCount: categoriesWithItems.length,
               itemBuilder: (context, index) {
-                final (gearCategory, gearListItemsAndItems) =
-                    categoriesWithItems[index];
+                final gearCategoryWithItems = categoriesWithItems[index];
+                final gearCategory = gearCategoryWithItems.gearCategory;
+                final selectedItems = gearCategoryWithItems.selectedItems;
+                final nonSelectedItems = gearCategoryWithItems.nonSelectedItems;
                 final filteredGearListItemsAndItems = unpackedOnly.isOn
-                    ? gearListItemsAndItems
+                    ? selectedItems
                         .where(
                           (gearListItemsAndItem) =>
                               !gearListItemsAndItem.$1.packed,
                         )
                         .toList()
-                    : gearListItemsAndItems;
+                    : selectedItems;
                 return Card(
                   child: Container(
                     width: 400,
@@ -97,8 +98,7 @@ class _GearListDetails extends StatelessWidget {
                                 );
                               }
                             },
-                            gearItems:
-                                dataProvider.gearItems[gearCategory.id] ?? [],
+                            gearItems: nonSelectedItems,
                           ),
                           const SizedBox(height: 10),
                         ],
@@ -222,7 +222,7 @@ class _GearListDetails extends StatelessWidget {
                         SizedBox(
                           width: double.infinity,
                           child: Text(
-                            "${(gearListItemsAndItems.weight / 1000).toStringAsFixed(3)} kg",
+                            "${(selectedItems.weight / 1000).toStringAsFixed(3)} kg",
                             style: Theme.of(context).textTheme.titleLarge,
                             textAlign: TextAlign.end,
                           ),

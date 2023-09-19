@@ -292,6 +292,20 @@ class GearItemAccessor extends TableAccessor<GearItemId, GearItem> {
     );
     return data.map(fromDbRecord).toList();
   }
+
+  Future<List<GearItem>> getNonSelectedByGearCategoryIdAndListId(
+    GearCategoryId gearCategoryId,
+    GearListId gearListId,
+  ) async {
+    final data = await TableAccessor.database.query(
+      tableName,
+      where: "${Columns.gearCategoryId} = ? and "
+          "not exists (select * from ${Tables.gearListItem} where ${Columns.gearItemId} = ${Tables.gearItem}.${Columns.id} and ${Columns.gearListId} = ?)",
+      whereArgs: [gearCategoryId.id, gearListId.id],
+      orderBy: Columns.sortIndex,
+    );
+    return data.map(fromDbRecord).toList();
+  }
 }
 
 class GearCategoryAccessor extends TableAccessor<GearCategoryId, GearCategory> {

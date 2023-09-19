@@ -151,6 +151,15 @@ class GearItemDataProvider extends EntityDataProvider<GearItemId, GearItem> {
     GearCategoryId gearCategoryId,
   ) =>
       tableAccessor.getByGearCategoryId(gearCategoryId);
+
+  Future<List<GearItem>> getNonSelectedByGearCategoryIdAndListId(
+    GearCategoryId gearCategoryId,
+    GearListId gearListId,
+  ) =>
+      tableAccessor.getNonSelectedByGearCategoryIdAndListId(
+        gearCategoryId,
+        gearListId,
+      );
 }
 
 class GearCategoryDataProvider
@@ -389,6 +398,21 @@ class GearItemOverviewDataProvider extends ChangeNotifier {
   }
 }
 
+class GearCategoryWithItems {
+  GearCategoryWithItems(
+    this.gearCategory,
+    this.nonSelectedItems,
+    this.selectedItems,
+  );
+
+  final GearCategory gearCategory;
+  final List<GearItem> nonSelectedItems;
+  final List<(GearListItem, GearItem)> selectedItems;
+
+  int get weight => selectedItems.weight;
+  List<GearListItem> get listItems => selectedItems.listItems;
+}
+
 class GearListDetailsDataProvider extends ChangeNotifier {
   factory GearListDetailsDataProvider() {
     if (_instance == null) {
@@ -412,16 +436,12 @@ class GearListDetailsDataProvider extends ChangeNotifier {
   GearItemDataProvider get gearItemDataProvider =>
       _dataProvider._gearItemDataProvider;
 
-  Map<GearCategoryId, List<GearItem>> _gearItems = {};
-  Map<GearCategoryId, List<GearItem>> get gearItems => _gearItems;
   GearListId? _gearListId;
 
-  (
-    GearList,
-    List<(GearCategory, List<(GearListItem, GearItem)>)>
-  )? _gearItemsForList;
-  (GearList, List<(GearCategory, List<(GearListItem, GearItem)>)>)?
-      gearItemsForList(GearListId gearListId) {
+  (GearList, List<GearCategoryWithItems>)? _gearItemsForList;
+  (GearList, List<GearCategoryWithItems>)? gearItemsForList(
+    GearListId gearListId,
+  ) {
     if (_gearListId == gearListId) {
       return _gearItemsForList;
     } else {
@@ -432,34 +452,30 @@ class GearListDetailsDataProvider extends ChangeNotifier {
   }
 
   Future<void> _onUpdate() async {
-    final gearItems = await gearItemDataProvider.getAll();
-    final gearItemMap = <GearCategoryId, List<GearItem>>{};
-    for (final gearItem in gearItems) {
-      if (gearItemMap.containsKey(gearItem.gearCategoryId)) {
-        gearItemMap[gearItem.gearCategoryId]!.add(gearItem);
-      } else {
-        gearItemMap[gearItem.gearCategoryId] = [gearItem];
-      }
-    }
-    _gearItems = gearItemMap;
     if (_gearListId == null) {
-      notifyListeners();
       return;
     }
     final gearList =
         await _dataProvider._gearListDataProvider.getById(_gearListId!);
-    final gearListCategories =
+    final gearCategories =
         await _dataProvider._gearCategoryDataProvider.getAll();
-    final categoriesWithItems =
-        <(GearCategory, List<(GearListItem, GearItem)>)>[];
-    for (final gearCategory in gearListCategories) {
+    final categoriesWithItems = <GearCategoryWithItems>[];
+    for (final gearCategory in gearCategories) {
+      final gearItems =
+          await gearItemDataProvider.getNonSelectedByGearCategoryIdAndListId(
+        gearCategory.id,
+        _gearListId!,
+      );
       final gearListItemsWithItems = await _dataProvider
           ._gearListItemDataProvider
-          .getWithItemByListAndCategory(
-        _gearListId!,
-        gearCategory.id,
+          .getWithItemByListAndCategory(_gearListId!, gearCategory.id);
+      categoriesWithItems.add(
+        GearCategoryWithItems(
+          gearCategory,
+          gearItems,
+          gearListItemsWithItems,
+        ),
       );
-      categoriesWithItems.add((gearCategory, gearListItemsWithItems));
     }
 
     _gearItemsForList = (gearList, categoriesWithItems);
@@ -563,12 +579,11 @@ extension ListItemsWithItems on List<(GearListItem, GearItem)> {
   List<GearListItem> get listItems => map((e) => e.$1).toList();
 }
 
-extension CategoriesWithItems
-    on List<(GearCategory, List<(GearListItem, GearItem)>)> {
-  int get weight => map((c) => c.$2.weight).sum;
+extension GearCategoryWithItemsList on List<GearCategoryWithItems> {
+  int get weight => map((c) => c.weight).sum;
 
   List<GearListItem> get listItems =>
-      map((e) => e.$2.listItems).flattened.toList();
+      map((e) => e.listItems).flattened.toList();
 }
 
 extension ListItemWithItemX on ((GearListItem?, GearListItem?), GearItem) {
