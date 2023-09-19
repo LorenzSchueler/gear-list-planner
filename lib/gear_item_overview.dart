@@ -274,6 +274,7 @@ class _ItemInputState extends State<_ItemInput> {
       child: Row(
         children: [
           Expanded(
+            flex: 2,
             child: TextFormField(
               focusNode: typeFocus,
               decoration: const InputDecoration(labelText: "Type"),
@@ -282,8 +283,9 @@ class _ItemInputState extends State<_ItemInput> {
                   type == null || type.isEmpty ? 'please enter a type' : null,
             ),
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: 5),
           Expanded(
+            flex: 2,
             child: TextFormField(
               decoration: const InputDecoration(labelText: "Name"),
               onChanged: (name) => setState(() => _name = name),
@@ -291,7 +293,7 @@ class _ItemInputState extends State<_ItemInput> {
                   name == null || name.isEmpty ? 'please enter a name' : null,
             ),
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: 5),
           Expanded(
             child: TextFormField(
               decoration: const InputDecoration(labelText: "Weight"),
@@ -313,9 +315,9 @@ class _ItemInputState extends State<_ItemInput> {
             onPressed: () {
               if (_formKey.currentState?.validate() ?? false) {
                 widget.onAdd(_type, _name, _weight);
-                _formKey.currentState?.reset();
-                typeFocus.requestFocus();
               }
+              _formKey.currentState?.reset();
+              typeFocus.requestFocus();
             },
             icon: const Icon(Icons.add),
           ),
