@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gear_list_planner/bool_toggle.dart';
 import 'package:gear_list_planner/data_provider.dart';
+import 'package:gear_list_planner/hover_scrolling_text.dart';
 import 'package:gear_list_planner/model.dart';
 import 'package:provider/provider.dart';
 
@@ -60,11 +61,9 @@ class _GearListCompare extends StatelessWidget {
                     padding: const EdgeInsets.all(10),
                     child: Column(
                       children: [
-                        Text(
+                        HoverScrollingText(
                           gearCategory.name,
                           style: Theme.of(context).textTheme.titleLarge,
-                          softWrap: false,
-                          overflow: TextOverflow.ellipsis,
                         ),
                         Expanded(
                           child: ListView.builder(
@@ -89,18 +88,14 @@ class _GearListCompare extends StatelessWidget {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        Text(
+                                        HoverScrollingText(
                                           gearItem.type,
                                           style: Theme.of(context)
                                               .textTheme
                                               .bodyLarge,
-                                          softWrap: false,
-                                          overflow: TextOverflow.ellipsis,
                                         ),
-                                        Text(
+                                        HoverScrollingText(
                                           gearItem.name,
-                                          softWrap: false,
-                                          overflow: TextOverflow.ellipsis,
                                         ),
                                       ],
                                     ),

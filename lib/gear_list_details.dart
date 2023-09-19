@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gear_list_planner/bool_toggle.dart';
 import 'package:gear_list_planner/data_provider.dart';
 import 'package:gear_list_planner/dialog.dart';
+import 'package:gear_list_planner/hover_scrolling_text.dart';
 import 'package:gear_list_planner/model.dart';
 import 'package:provider/provider.dart';
 
@@ -69,11 +70,9 @@ class _GearListDetails extends StatelessWidget {
                     padding: const EdgeInsets.all(10),
                     child: Column(
                       children: [
-                        Text(
+                        HoverScrollingText(
                           gearCategory.name,
                           style: Theme.of(context).textTheme.titleLarge,
-                          softWrap: false,
-                          overflow: TextOverflow.ellipsis,
                         ),
                         if (!gearList.readOnly) ...[
                           _ListItemInput(
@@ -188,18 +187,14 @@ class _GearListDetails extends StatelessWidget {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        Text(
+                                        HoverScrollingText(
                                           gearItem.type,
                                           style: Theme.of(context)
                                               .textTheme
                                               .bodyLarge,
-                                          softWrap: false,
-                                          overflow: TextOverflow.ellipsis,
                                         ),
-                                        Text(
+                                        HoverScrollingText(
                                           gearItem.name,
-                                          softWrap: false,
-                                          overflow: TextOverflow.ellipsis,
                                         ),
                                       ],
                                     ),
@@ -362,7 +357,7 @@ class _ListItemInputState extends State<_ListItemInput> {
             dropdownMenuEntries: widget.gearItems
                 .map(
                   (i) => DropdownMenuEntry(
-                    // TODO user labelWidget when implemented
+                    // TODO user labelWidget: HoverScrollingText when implemented
                     value: i,
                     label: "${i.type} - ${i.name}",
                   ),
