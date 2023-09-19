@@ -360,7 +360,13 @@ class _ListItemInputState extends State<_ListItemInput> {
         Expanded(
           child: DropdownMenu(
             dropdownMenuEntries: widget.gearItems
-                .map((i) => DropdownMenuEntry(value: i, label: i.name))
+                .map(
+                  (i) => DropdownMenuEntry(
+                    // TODO user labelWidget when implemented
+                    value: i,
+                    label: "${i.type} - ${i.name}",
+                  ),
+                )
                 .toList(),
             inputDecorationTheme:
                 const InputDecorationTheme(contentPadding: EdgeInsets.zero),
