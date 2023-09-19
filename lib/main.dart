@@ -48,16 +48,31 @@ class _InitAppWrapperState extends State<InitAppWrapper> {
     initialize();
   }
 
+  static const _surface = Color.fromARGB(255, 220, 220, 220);
+  final ThemeData _theme = ThemeData(
+    useMaterial3: true,
+    colorScheme: ColorScheme.fromSeed(
+      seedColor: Colors.blue,
+      errorContainer: Colors.green,
+    ),
+    appBarTheme: const AppBarTheme(color: _surface),
+    navigationBarTheme: const NavigationBarThemeData(
+      backgroundColor: _surface,
+      surfaceTintColor: Colors.transparent,
+      indicatorColor: Colors.white,
+    ),
+    cardTheme: const CardTheme(
+      margin: EdgeInsets.all(10),
+      color: _surface,
+      surfaceTintColor: Colors.transparent,
+    ),
+  );
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Gear List Planner',
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue)
-            .copyWith(errorContainer: Colors.green),
-        cardTheme: const CardTheme(margin: EdgeInsets.all(10)),
-      ),
+      title: "Gear List Planner",
+      theme: _theme,
       home: _progress != null
           ? Center(child: LinearProgressIndicator(value: _progress))
           : ChangeNotifierProvider(
@@ -125,7 +140,6 @@ class _AppState extends State<App> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        elevation: 3,
         title: Row(
           children: [
             Text(
