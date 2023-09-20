@@ -21,126 +21,16 @@ class GearItemOverview extends StatelessWidget {
               itemBuilder: (context, index) {
                 final (gearCategory, gearItems) =
                     gearCategoriesWithItems[index];
-                return Card(
-                  key: ValueKey(index),
-                  child: Container(
-                    width: 350,
-                    padding: const EdgeInsets.all(10),
-                    child: Column(
-                      children: [
-                        Row(
-                          children: [
-                            ReorderableDragStartListener(
-                              index: index,
-                              child: const Icon(Icons.drag_handle_rounded),
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: HoverScrollingText(
-                                gearCategory.name,
-                                style: Theme.of(context).textTheme.titleLarge,
-                              ),
-                            ),
-                            IconButton(
-                              onPressed: () => _editCategory(
-                                context,
-                                gearCategory,
-                                dataProvider.gearCategoryDataProvider,
-                              ),
-                              icon: const Icon(Icons.edit_rounded),
-                            ),
-                            IconButton(
-                              onPressed: () => _deleteCategory(
-                                context,
-                                gearCategory,
-                                dataProvider.gearCategoryDataProvider,
-                              ),
-                              icon: const Icon(Icons.delete_rounded),
-                            ),
-                          ],
-                        ),
-                        _ItemInput(
-                          onAdd: (type, name, weight) => _createItem(
-                            context,
-                            gearCategory,
-                            type,
-                            name,
-                            weight,
-                            dataProvider.gearItemDataProvider,
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        Expanded(
-                          child: ReorderableListView.builder(
-                            itemCount: gearItems.length,
-                            itemBuilder: (context, index) {
-                              final gearItem = gearItems[index];
-                              return Row(
-                                key: ValueKey(index),
-                                children: [
-                                  ReorderableDragStartListener(
-                                    index: index,
-                                    child:
-                                        const Icon(Icons.drag_handle_rounded),
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        HoverScrollingText(
-                                          gearItem.type,
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .bodyLarge,
-                                        ),
-                                        HoverScrollingText(
-                                          gearItem.name,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  const SizedBox(width: 5),
-                                  Text(
-                                    gearItem.weight.toString(),
-                                    style:
-                                        Theme.of(context).textTheme.bodyLarge,
-                                  ),
-                                  IconButton(
-                                    onPressed: () => _editItem(
-                                      context,
-                                      gearItem,
-                                      dataProvider.gearItemDataProvider,
-                                    ),
-                                    icon: const Icon(Icons.edit_rounded),
-                                  ),
-                                  IconButton(
-                                    onPressed: () => _deleteItem(
-                                      context,
-                                      gearItem,
-                                      dataProvider.gearItemDataProvider,
-                                    ),
-                                    icon: const Icon(Icons.delete_rounded),
-                                  ),
-                                ],
-                              );
-                            },
-                            buildDefaultDragHandles: false,
-                            onReorder: (oldIndex, newIndex) =>
-                                dataProvider.reorderGearItem(
-                              gearCategory.id,
-                              oldIndex,
-                              newIndex,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                return _CategoryCard(
+                  index: index,
+                  gearCategory: gearCategory,
+                  gearItems: gearItems,
+                  gearCategoryDataProvider:
+                      dataProvider.gearCategoryDataProvider,
+                  gearItemDataProvider: dataProvider.gearItemDataProvider,
                 );
               },
-              onReorder: dataProvider.reorderGearCategory,
+              onReorder: dataProvider.gearCategoryDataProvider.reorder,
             ),
             SliverToBoxAdapter(
               child: Align(
@@ -188,15 +78,141 @@ class GearItemOverview extends StatelessWidget {
       }
     }
   }
+}
+
+class _CategoryCard extends StatelessWidget {
+  const _CategoryCard({
+    required this.index,
+    required this.gearCategory,
+    required this.gearItems,
+    required this.gearCategoryDataProvider,
+    required this.gearItemDataProvider,
+  });
+
+  final int index;
+  final GearCategory gearCategory;
+  final List<GearItem> gearItems;
+  final GearItemDataProvider gearItemDataProvider;
+  final GearCategoryDataProvider gearCategoryDataProvider;
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      key: ValueKey(index),
+      child: Container(
+        width: 350,
+        padding: const EdgeInsets.all(10),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                ReorderableDragStartListener(
+                  index: index,
+                  child: const Icon(Icons.drag_handle_rounded),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: HoverScrollingText(
+                    gearCategory.name,
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                ),
+                IconButton(
+                  onPressed: () => _editCategory(
+                    context,
+                    gearCategory,
+                  ),
+                  icon: const Icon(Icons.edit_rounded),
+                ),
+                IconButton(
+                  onPressed: () => _deleteCategory(
+                    context,
+                    gearCategory,
+                  ),
+                  icon: const Icon(Icons.delete_rounded),
+                ),
+              ],
+            ),
+            _ItemInput(
+              onAdd: (type, name, weight) => _createItem(
+                context,
+                gearCategory,
+                type,
+                name,
+                weight,
+              ),
+            ),
+            const SizedBox(height: 10),
+            Expanded(
+              child: ReorderableListView.builder(
+                itemCount: gearItems.length,
+                itemBuilder: (context, index) {
+                  final gearItem = gearItems[index];
+                  return Row(
+                    key: ValueKey(index),
+                    children: [
+                      ReorderableDragStartListener(
+                        index: index,
+                        child: const Icon(Icons.drag_handle_rounded),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            HoverScrollingText(
+                              gearItem.type,
+                              style: Theme.of(context).textTheme.bodyLarge,
+                            ),
+                            HoverScrollingText(
+                              gearItem.name,
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 5),
+                      Text(
+                        gearItem.weight.toString(),
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      ),
+                      IconButton(
+                        onPressed: () => _editItem(
+                          context,
+                          gearItem,
+                        ),
+                        icon: const Icon(Icons.edit_rounded),
+                      ),
+                      IconButton(
+                        onPressed: () => _deleteItem(
+                          context,
+                          gearItem,
+                        ),
+                        icon: const Icon(Icons.delete_rounded),
+                      ),
+                    ],
+                  );
+                },
+                buildDefaultDragHandles: false,
+                onReorder: (oldIndex, newIndex) => gearItemDataProvider.reorder(
+                  gearCategory.id,
+                  oldIndex,
+                  newIndex,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   Future<void> _editCategory(
     BuildContext context,
     GearCategory gearCategory,
-    GearCategoryDataProvider dataProvider,
   ) async {
     final name = await showNameDialog(context, gearCategory.name);
     if (name != null) {
-      final result = await dataProvider.update(gearCategory..name = name);
+      final result =
+          await gearCategoryDataProvider.update(gearCategory..name = name);
       if (result.isError && context.mounted) {
         await showMessageDialog(
           context,
@@ -212,7 +228,6 @@ class GearItemOverview extends StatelessWidget {
   Future<void> _deleteCategory(
     BuildContext context,
     GearCategory gearCategory,
-    GearCategoryDataProvider dataProvider,
   ) async {
     final delete = await showDeleteWarningDialog(
       context,
@@ -220,7 +235,7 @@ class GearItemOverview extends StatelessWidget {
       "All Gear Items of '${gearCategory.name}' will be deleted too.",
     );
     if (delete) {
-      await dataProvider.delete(gearCategory);
+      await gearCategoryDataProvider.delete(gearCategory);
     }
   }
 
@@ -230,7 +245,6 @@ class GearItemOverview extends StatelessWidget {
     String type,
     String name,
     int weight,
-    GearItemDataProvider dataProvider,
   ) async {
     final gearItem = GearItem(
       id: GearItemId(0),
@@ -240,7 +254,7 @@ class GearItemOverview extends StatelessWidget {
       weight: weight,
       sortIndex: 0,
     );
-    final result = await dataProvider.create(gearItem, autoId: true);
+    final result = await gearItemDataProvider.create(gearItem, autoId: true);
     if (result.isError && context.mounted) {
       await showMessageDialog(
         context,
@@ -252,11 +266,7 @@ class GearItemOverview extends StatelessWidget {
     }
   }
 
-  Future<void> _editItem(
-    BuildContext context,
-    GearItem gearItem,
-    GearItemDataProvider dataProvider,
-  ) async {
+  Future<void> _editItem(BuildContext context, GearItem gearItem) async {
     final typeNameWeight = await showTypeNameWeightDialog(
       context,
       gearItem.type,
@@ -265,7 +275,7 @@ class GearItemOverview extends StatelessWidget {
     );
     if (typeNameWeight != null) {
       final (type, name, weight) = typeNameWeight;
-      final result = await dataProvider.update(
+      final result = await gearItemDataProvider.update(
         gearItem
           ..type = type
           ..name = name
@@ -283,14 +293,10 @@ class GearItemOverview extends StatelessWidget {
     }
   }
 
-  Future<void> _deleteItem(
-    BuildContext context,
-    GearItem gearItem,
-    GearItemDataProvider dataProvider,
-  ) async {
+  Future<void> _deleteItem(BuildContext context, GearItem gearItem) async {
     final delete = await showDeleteWarningDialog(context, gearItem.name, null);
     if (delete) {
-      await dataProvider.delete(gearItem);
+      await gearItemDataProvider.delete(gearItem);
     }
   }
 }

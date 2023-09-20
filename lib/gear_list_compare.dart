@@ -56,70 +56,9 @@ class _GearListCompare extends StatelessWidget {
                 final gearCategory = gearCategoryWithCompareItems.gearCategory;
                 final selectedItems =
                     gearCategoryWithCompareItems.selectedItems;
-                return Card(
-                  child: Container(
-                    width: 400,
-                    padding: const EdgeInsets.all(10),
-                    child: Column(
-                      children: [
-                        HoverScrollingText(
-                          gearCategory.name,
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                        Expanded(
-                          child: ListView.builder(
-                            itemCount: selectedItems.length,
-                            itemBuilder: (context, index) {
-                              final compareItem = selectedItems[index];
-                              return Row(
-                                key: ValueKey(index),
-                                children: [
-                                  Text(
-                                    "${compareItem.gearListItem1?.count ?? 0} - ${compareItem.gearListItem2?.count ?? 0}",
-                                    style:
-                                        Theme.of(context).textTheme.bodyLarge,
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Expanded(
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        HoverScrollingText(
-                                          compareItem.gearItem.type,
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .bodyLarge,
-                                        ),
-                                        HoverScrollingText(
-                                          compareItem.gearItem.name,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  const SizedBox(width: 5),
-                                  Text(
-                                    "${(compareItem.weight1 / 1000).toStringAsFixed(3)} - ${(compareItem.weight2 / 1000).toStringAsFixed(3)}",
-                                    style:
-                                        Theme.of(context).textTheme.bodyLarge,
-                                  ),
-                                ],
-                              );
-                            },
-                          ),
-                        ),
-                        SizedBox(
-                          width: double.infinity,
-                          child: Text(
-                            "${(selectedItems.weight1 / 1000).toStringAsFixed(3)} - ${(selectedItems.weight2 / 1000).toStringAsFixed(3)} kg",
-                            style: Theme.of(context).textTheme.titleLarge,
-                            textAlign: TextAlign.end,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                return _CategoryCard(
+                  gearCategory: gearCategory,
+                  selectedItems: selectedItems,
                 );
               },
             ),
@@ -137,6 +76,78 @@ class _GearListCompare extends StatelessWidget {
                     ),
                   ],
                 ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _CategoryCard extends StatelessWidget {
+  const _CategoryCard({
+    required this.gearCategory,
+    required this.selectedItems,
+  });
+
+  final GearCategory gearCategory;
+  final List<CompareItem> selectedItems;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Container(
+        width: 400,
+        padding: const EdgeInsets.all(10),
+        child: Column(
+          children: [
+            HoverScrollingText(
+              gearCategory.name,
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: selectedItems.length,
+                itemBuilder: (context, index) {
+                  final compareItem = selectedItems[index];
+                  return Row(
+                    key: ValueKey(index),
+                    children: [
+                      Text(
+                        "${compareItem.gearListItem1?.count ?? 0} - ${compareItem.gearListItem2?.count ?? 0}",
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            HoverScrollingText(
+                              compareItem.gearItem.type,
+                              style: Theme.of(context).textTheme.bodyLarge,
+                            ),
+                            HoverScrollingText(compareItem.gearItem.name),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 5),
+                      Text(
+                        "${(compareItem.weight1 / 1000).toStringAsFixed(3)} - ${(compareItem.weight2 / 1000).toStringAsFixed(3)}",
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
+            SizedBox(
+              width: double.infinity,
+              child: Text(
+                "${(selectedItems.weight1 / 1000).toStringAsFixed(3)} - ${(selectedItems.weight2 / 1000).toStringAsFixed(3)} kg",
+                style: Theme.of(context).textTheme.titleLarge,
+                textAlign: TextAlign.end,
               ),
             ),
           ],

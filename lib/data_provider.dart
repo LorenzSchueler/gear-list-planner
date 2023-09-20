@@ -162,6 +162,20 @@ class GearItemDataProvider extends EntityDataProvider<GearItemId, GearItem> {
         gearCategoryId,
         gearListId,
       );
+
+  Future<void> reorder(
+    GearCategoryId gearCategoryId,
+    int oldIndex,
+    int newIndex,
+  ) async {
+    final all = await getByGearCategoryId(gearCategoryId);
+
+    all
+      ..reorder(oldIndex, newIndex)
+      ..forEachIndexed((index, item) => item..sortIndex = index);
+
+    await updateMultiple(all);
+  }
 }
 
 class GearCategoryDataProvider
@@ -187,6 +201,16 @@ class GearCategoryDataProvider
       object.sortIndex = maxSortIndex + 1;
     }
     return super.create(object, autoId: autoId, notify: notify);
+  }
+
+  Future<void> reorder(int oldIndex, int newIndex) async {
+    final all = await getAll();
+
+    all
+      ..reorder(oldIndex, newIndex)
+      ..forEachIndexed((index, item) => item..sortIndex = index);
+
+    await updateMultiple(all);
   }
 }
 
@@ -377,30 +401,6 @@ class GearItemOverviewDataProvider extends ChangeNotifier {
     }
     _gearCategoriesWithItems = gearCategoriesWithItems;
     notifyListeners();
-  }
-
-  Future<void> reorderGearCategory(int oldIndex, int newIndex) async {
-    final all = await gearCategoryDataProvider.getAll();
-
-    all
-      ..reorder(oldIndex, newIndex)
-      ..forEachIndexed((index, item) => item..sortIndex = index);
-
-    await gearCategoryDataProvider.updateMultiple(all);
-  }
-
-  Future<void> reorderGearItem(
-    GearCategoryId gearCategoryId,
-    int oldIndex,
-    int newIndex,
-  ) async {
-    final all = await gearItemDataProvider.getByGearCategoryId(gearCategoryId);
-
-    all
-      ..reorder(oldIndex, newIndex)
-      ..forEachIndexed((index, item) => item..sortIndex = index);
-
-    await gearItemDataProvider.updateMultiple(all);
   }
 }
 

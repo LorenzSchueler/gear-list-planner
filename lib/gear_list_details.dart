@@ -57,129 +57,20 @@ class _GearListDetails extends StatelessWidget {
                 final gearCategory = gearCategoryWithItems.gearCategory;
                 final selectedItems = gearCategoryWithItems.selectedItems;
                 final nonSelectedItems = gearCategoryWithItems.nonSelectedItems;
-                final filteredGearListItemsAndItems = unpackedOnly.isOn
+                final filteredSelectedItems = unpackedOnly.isOn
                     ? selectedItems
                         .where(
-                          (gearListItemsAndItem) =>
-                              !gearListItemsAndItem.$1.packed,
+                          (listItemsAndItem) => !listItemsAndItem.$1.packed,
                         )
                         .toList()
                     : selectedItems;
-                return Card(
-                  child: Container(
-                    width: 400,
-                    padding: const EdgeInsets.all(10),
-                    child: Column(
-                      children: [
-                        HoverScrollingText(
-                          gearCategory.name,
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                        if (!gearList.readOnly) ...[
-                          _ListItemInput(
-                            onAdd: (gearItemId) =>
-                                _createListItem(context, gearItemId),
-                            gearItems: nonSelectedItems,
-                          ),
-                          const SizedBox(height: 10),
-                        ],
-                        Expanded(
-                          child: ListView.builder(
-                            itemCount: filteredGearListItemsAndItems.length,
-                            itemBuilder: (context, index) {
-                              final gearListItemsAndItem =
-                                  filteredGearListItemsAndItems[index];
-                              final (gearListItem, gearItem) =
-                                  gearListItemsAndItem;
-                              return Row(
-                                key: ValueKey(index),
-                                children: [
-                                  Checkbox(
-                                    value: gearListItem.packed,
-                                    onChanged: gearList.readOnly
-                                        ? null
-                                        : (packed) {
-                                            if (packed != null) {
-                                              _updateListItem(
-                                                context,
-                                                gearListItem..packed = packed,
-                                              );
-                                            }
-                                          },
-                                  ),
-                                  IconButton(
-                                    onPressed: gearList.readOnly ||
-                                            gearListItem.count <= 1
-                                        ? null
-                                        : () => _updateListItem(
-                                              context,
-                                              gearListItem..count -= 1,
-                                            ),
-                                    icon: const Icon(Icons.remove),
-                                  ),
-                                  Text(
-                                    gearListItem.count.toString(),
-                                    style:
-                                        Theme.of(context).textTheme.bodyLarge,
-                                  ),
-                                  IconButton(
-                                    onPressed: gearList.readOnly
-                                        ? null
-                                        : () => _updateListItem(
-                                              context,
-                                              gearListItem..count += 1,
-                                            ),
-                                    icon: const Icon(Icons.add),
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        HoverScrollingText(
-                                          gearItem.type,
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .bodyLarge,
-                                        ),
-                                        HoverScrollingText(
-                                          gearItem.name,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  const SizedBox(width: 5),
-                                  Text(
-                                    (gearListItemsAndItem.weight / 1000)
-                                        .toStringAsFixed(3),
-                                    style:
-                                        Theme.of(context).textTheme.bodyLarge,
-                                  ),
-                                  IconButton(
-                                    onPressed: gearList.readOnly
-                                        ? null
-                                        : () => dataProvider
-                                            .gearListItemDataProvider
-                                            .delete(gearListItem),
-                                    icon: const Icon(Icons.close_rounded),
-                                  ),
-                                ],
-                              );
-                            },
-                          ),
-                        ),
-                        SizedBox(
-                          width: double.infinity,
-                          child: Text(
-                            "${(selectedItems.weight / 1000).toStringAsFixed(3)} kg",
-                            style: Theme.of(context).textTheme.titleLarge,
-                            textAlign: TextAlign.end,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                return _CategoryCard(
+                  gearList: gearList,
+                  gearCategory: gearCategory,
+                  nonSelectedItems: nonSelectedItems,
+                  selectedItems: selectedItems,
+                  filteredSelectedItems: filteredSelectedItems,
+                  dataProvider: dataProvider.gearListItemDataProvider,
                 );
               },
             ),
@@ -276,6 +167,132 @@ class _GearListDetails extends StatelessWidget {
       );
     }
   }
+}
+
+class _CategoryCard extends StatelessWidget {
+  const _CategoryCard({
+    required this.gearList,
+    required this.gearCategory,
+    required this.nonSelectedItems,
+    required this.selectedItems,
+    required this.filteredSelectedItems,
+    required this.dataProvider,
+  });
+
+  final GearList gearList;
+  final GearCategory gearCategory;
+  final List<GearItem> nonSelectedItems;
+  final List<(GearListItem, GearItem)> selectedItems;
+  final List<(GearListItem, GearItem)> filteredSelectedItems;
+  final GearListItemDataProvider dataProvider;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Container(
+        width: 400,
+        padding: const EdgeInsets.all(10),
+        child: Column(
+          children: [
+            HoverScrollingText(
+              gearCategory.name,
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            if (!gearList.readOnly) ...[
+              _ListItemInput(
+                onAdd: (gearItemId) => _createListItem(context, gearItemId),
+                gearItems: nonSelectedItems,
+              ),
+              const SizedBox(height: 10),
+            ],
+            Expanded(
+              child: ListView.builder(
+                itemCount: filteredSelectedItems.length,
+                itemBuilder: (context, index) {
+                  final gearListItemsAndItem = filteredSelectedItems[index];
+                  final (gearListItem, gearItem) = gearListItemsAndItem;
+                  return Row(
+                    key: ValueKey(index),
+                    children: [
+                      Checkbox(
+                        value: gearListItem.packed,
+                        onChanged: gearList.readOnly
+                            ? null
+                            : (packed) {
+                                if (packed != null) {
+                                  _updateListItem(
+                                    context,
+                                    gearListItem..packed = packed,
+                                  );
+                                }
+                              },
+                      ),
+                      IconButton(
+                        onPressed: gearList.readOnly || gearListItem.count <= 1
+                            ? null
+                            : () => _updateListItem(
+                                  context,
+                                  gearListItem..count -= 1,
+                                ),
+                        icon: const Icon(Icons.remove),
+                      ),
+                      Text(
+                        gearListItem.count.toString(),
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      ),
+                      IconButton(
+                        onPressed: gearList.readOnly
+                            ? null
+                            : () => _updateListItem(
+                                  context,
+                                  gearListItem..count += 1,
+                                ),
+                        icon: const Icon(Icons.add),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            HoverScrollingText(
+                              gearItem.type,
+                              style: Theme.of(context).textTheme.bodyLarge,
+                            ),
+                            HoverScrollingText(
+                              gearItem.name,
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 5),
+                      Text(
+                        (gearListItemsAndItem.weight / 1000).toStringAsFixed(3),
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      ),
+                      IconButton(
+                        onPressed: gearList.readOnly
+                            ? null
+                            : () => dataProvider.delete(gearListItem),
+                        icon: const Icon(Icons.close_rounded),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
+            SizedBox(
+              width: double.infinity,
+              child: Text(
+                "${(selectedItems.weight / 1000).toStringAsFixed(3)} kg",
+                style: Theme.of(context).textTheme.titleLarge,
+                textAlign: TextAlign.end,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   Future<void> _createListItem(
     BuildContext context,
@@ -288,8 +305,7 @@ class _GearListDetails extends StatelessWidget {
       count: 1,
       packed: false,
     );
-    final result = await dataProvider.gearListItemDataProvider
-        .create(gearListItem, autoId: true);
+    final result = await dataProvider.create(gearListItem, autoId: true);
     if (result.isError && context.mounted) {
       await showMessageDialog(
         context,
@@ -305,8 +321,7 @@ class _GearListDetails extends StatelessWidget {
     BuildContext context,
     GearListItem gearListItem,
   ) async {
-    final result =
-        await dataProvider.gearListItemDataProvider.update(gearListItem);
+    final result = await dataProvider.update(gearListItem);
     if (result.isError && context.mounted) {
       await showMessageDialog(
         context,
