@@ -11,237 +11,287 @@ class GearItemOverview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<GearItemOverviewDataProvider>(
-      builder: (context, dataProvider, _) => CustomScrollView(
-        scrollDirection: Axis.horizontal,
-        slivers: [
-          SliverReorderableList(
-            itemCount: dataProvider.gearCategoriesWithItems.length,
-            itemBuilder: (context, index) {
-              final (gearCategory, gearItems) =
-                  dataProvider.gearCategoriesWithItems[index];
-              return Card(
-                key: ValueKey(index),
-                child: Container(
-                  width: 350,
-                  padding: const EdgeInsets.all(10),
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          ReorderableDragStartListener(
-                            index: index,
-                            child: const Icon(Icons.drag_handle_rounded),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: HoverScrollingText(
-                              gearCategory.name,
-                              style: Theme.of(context).textTheme.titleLarge,
+      builder: (context, dataProvider, _) {
+        final gearCategoriesWithItems = dataProvider.gearCategoriesWithItems;
+        return CustomScrollView(
+          scrollDirection: Axis.horizontal,
+          slivers: [
+            SliverReorderableList(
+              itemCount: gearCategoriesWithItems.length,
+              itemBuilder: (context, index) {
+                final (gearCategory, gearItems) =
+                    gearCategoriesWithItems[index];
+                return Card(
+                  key: ValueKey(index),
+                  child: Container(
+                    width: 350,
+                    padding: const EdgeInsets.all(10),
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            ReorderableDragStartListener(
+                              index: index,
+                              child: const Icon(Icons.drag_handle_rounded),
                             ),
-                          ),
-                          IconButton(
-                            onPressed: () async {
-                              final name = await showNameDialog(
-                                context,
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: HoverScrollingText(
                                 gearCategory.name,
-                              );
-                              if (name != null) {
-                                final result = await dataProvider
-                                    .gearCategoryDataProvider
-                                    .update(gearCategory..name = name);
-                                if (result.isError && context.mounted) {
-                                  await showMessageDialog(
-                                    context,
-                                    "An Error Occurred",
-                                    result.error!.isUniqueViolation
-                                        ? "A category with the same name already exists."
-                                        : result.errorMessage!,
-                                  );
-                                }
-                              }
-                            },
-                            icon: const Icon(Icons.edit_rounded),
-                          ),
-                          IconButton(
-                            onPressed: () async {
-                              final delete = await showDeleteWarningDialog(
+                                style: Theme.of(context).textTheme.titleLarge,
+                              ),
+                            ),
+                            IconButton(
+                              onPressed: () => _editCategory(
                                 context,
-                                gearCategory.name,
-                                "All Gear Items of '${gearCategory.name}' will be deleted too.",
-                              );
-                              if (delete) {
-                                await dataProvider.gearCategoryDataProvider
-                                    .delete(gearCategory);
-                              }
-                            },
-                            icon: const Icon(Icons.delete_rounded),
-                          ),
-                        ],
-                      ),
-                      _ItemInput(
-                        onAdd: (type, name, weight) async {
-                          final gearItem = GearItem(
-                            id: GearItemId(0),
-                            gearCategoryId: gearCategory.id,
-                            name: name,
-                            type: type,
-                            weight: weight,
-                            sortIndex: 0,
-                          );
-                          final result = await dataProvider.gearItemDataProvider
-                              .create(gearItem, autoId: true);
-                          if (result.isError && context.mounted) {
-                            await showMessageDialog(
-                              context,
-                              "An Error Occurred",
-                              result.error!.isUniqueViolation
-                                  ? "An item with the same name already exists."
-                                  : result.errorMessage!,
-                            );
-                          }
-                        },
-                      ),
-                      const SizedBox(height: 10),
-                      Expanded(
-                        child: ReorderableListView.builder(
-                          itemCount: gearItems.length,
-                          itemBuilder: (context, index) {
-                            final gearItem = gearItems[index];
-                            return Row(
-                              key: ValueKey(index),
-                              children: [
-                                ReorderableDragStartListener(
-                                  index: index,
-                                  child: const Icon(Icons.drag_handle_rounded),
-                                ),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      HoverScrollingText(
-                                        gearItem.type,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodyLarge,
-                                      ),
-                                      HoverScrollingText(
-                                        gearItem.name,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(width: 5),
-                                Text(
-                                  gearItem.weight.toString(),
-                                  style: Theme.of(context).textTheme.bodyLarge,
-                                ),
-                                IconButton(
-                                  onPressed: () async {
-                                    final typeNameWeight =
-                                        await showTypeNameWeightDialog(
-                                      context,
-                                      gearItem.type,
-                                      gearItem.name,
-                                      gearItem.weight,
-                                    );
-                                    if (typeNameWeight != null) {
-                                      final (type, name, weight) =
-                                          typeNameWeight;
-                                      final result = await dataProvider
-                                          .gearItemDataProvider
-                                          .update(
-                                        gearItem
-                                          ..type = type
-                                          ..name = name
-                                          ..weight = weight,
-                                      );
-                                      if (result.isError && context.mounted) {
-                                        await showMessageDialog(
-                                          context,
-                                          "An Error Occurred",
-                                          result.error!.isUniqueViolation
-                                              ? "An item with the same name already exists."
-                                              : result.errorMessage!,
-                                        );
-                                      }
-                                    }
-                                  },
-                                  icon: const Icon(Icons.edit_rounded),
-                                ),
-                                IconButton(
-                                  onPressed: () async {
-                                    final delete =
-                                        await showDeleteWarningDialog(
-                                      context,
-                                      gearItem.name,
-                                      null,
-                                    );
-                                    if (delete) {
-                                      await dataProvider.gearItemDataProvider
-                                          .delete(gearItem);
-                                    }
-                                  },
-                                  icon: const Icon(Icons.delete_rounded),
-                                ),
-                              ],
-                            );
-                          },
-                          buildDefaultDragHandles: false,
-                          onReorder: (oldIndex, newIndex) =>
-                              dataProvider.reorderGearItem(
-                            gearCategory.id,
-                            oldIndex,
-                            newIndex,
+                                gearCategory,
+                                dataProvider.gearCategoryDataProvider,
+                              ),
+                              icon: const Icon(Icons.edit_rounded),
+                            ),
+                            IconButton(
+                              onPressed: () => _deleteCategory(
+                                context,
+                                gearCategory,
+                                dataProvider.gearCategoryDataProvider,
+                              ),
+                              icon: const Icon(Icons.delete_rounded),
+                            ),
+                          ],
+                        ),
+                        _ItemInput(
+                          onAdd: (type, name, weight) => _createItem(
+                            context,
+                            gearCategory,
+                            type,
+                            name,
+                            weight,
+                            dataProvider.gearItemDataProvider,
                           ),
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 10),
+                        Expanded(
+                          child: ReorderableListView.builder(
+                            itemCount: gearItems.length,
+                            itemBuilder: (context, index) {
+                              final gearItem = gearItems[index];
+                              return Row(
+                                key: ValueKey(index),
+                                children: [
+                                  ReorderableDragStartListener(
+                                    index: index,
+                                    child:
+                                        const Icon(Icons.drag_handle_rounded),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        HoverScrollingText(
+                                          gearItem.type,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyLarge,
+                                        ),
+                                        HoverScrollingText(
+                                          gearItem.name,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(width: 5),
+                                  Text(
+                                    gearItem.weight.toString(),
+                                    style:
+                                        Theme.of(context).textTheme.bodyLarge,
+                                  ),
+                                  IconButton(
+                                    onPressed: () => _editItem(
+                                      context,
+                                      gearItem,
+                                      dataProvider.gearItemDataProvider,
+                                    ),
+                                    icon: const Icon(Icons.edit_rounded),
+                                  ),
+                                  IconButton(
+                                    onPressed: () => _deleteItem(
+                                      context,
+                                      gearItem,
+                                      dataProvider.gearItemDataProvider,
+                                    ),
+                                    icon: const Icon(Icons.delete_rounded),
+                                  ),
+                                ],
+                              );
+                            },
+                            buildDefaultDragHandles: false,
+                            onReorder: (oldIndex, newIndex) =>
+                                dataProvider.reorderGearItem(
+                              gearCategory.id,
+                              oldIndex,
+                              newIndex,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              );
-            },
-            onReorder: dataProvider.reorderGearCategory,
-          ),
-          SliverToBoxAdapter(
-            child: Align(
-              alignment: Alignment.topLeft,
-              child: UnconstrainedBox(
-                child: Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: FilledButton(
-                    onPressed: () async {
-                      final name = await showNameDialog(context, null);
-                      if (name != null) {
-                        final gearCategory = GearCategory(
-                          id: GearCategoryId(0),
-                          name: name,
-                          sortIndex: 0,
-                        );
-                        final result = await dataProvider
-                            .gearCategoryDataProvider
-                            .create(gearCategory, autoId: true);
-                        if (result.isError && context.mounted) {
-                          await showMessageDialog(
-                            context,
-                            "An Error Occurred",
-                            result.error!.isUniqueViolation
-                                ? "A category with the same name already exists."
-                                : result.errorMessage!,
-                          );
-                        }
-                      }
-                    },
-                    child: const Text("Add Category"),
+                );
+              },
+              onReorder: dataProvider.reorderGearCategory,
+            ),
+            SliverToBoxAdapter(
+              child: Align(
+                alignment: Alignment.topLeft,
+                child: UnconstrainedBox(
+                  child: Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: FilledButton(
+                      onPressed: () => _createCategory(
+                        context,
+                        dataProvider.gearCategoryDataProvider,
+                      ),
+                      child: const Text("Add Category"),
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-        ],
-      ),
+          ],
+        );
+      },
     );
+  }
+
+  Future<void> _createCategory(
+    BuildContext context,
+    GearCategoryDataProvider dataProvider,
+  ) async {
+    final name = await showNameDialog(context, null);
+    if (name != null) {
+      final gearCategory = GearCategory(
+        id: GearCategoryId(0),
+        name: name,
+        sortIndex: 0,
+      );
+      final result = await dataProvider.create(gearCategory, autoId: true);
+      if (result.isError && context.mounted) {
+        await showMessageDialog(
+          context,
+          "An Error Occurred",
+          result.error!.isUniqueViolation
+              ? "A category with the same name already exists."
+              : result.errorMessage!,
+        );
+      }
+    }
+  }
+
+  Future<void> _editCategory(
+    BuildContext context,
+    GearCategory gearCategory,
+    GearCategoryDataProvider dataProvider,
+  ) async {
+    final name = await showNameDialog(context, gearCategory.name);
+    if (name != null) {
+      final result = await dataProvider.update(gearCategory..name = name);
+      if (result.isError && context.mounted) {
+        await showMessageDialog(
+          context,
+          "An Error Occurred",
+          result.error!.isUniqueViolation
+              ? "A category with the same name already exists."
+              : result.errorMessage!,
+        );
+      }
+    }
+  }
+
+  Future<void> _deleteCategory(
+    BuildContext context,
+    GearCategory gearCategory,
+    GearCategoryDataProvider dataProvider,
+  ) async {
+    final delete = await showDeleteWarningDialog(
+      context,
+      gearCategory.name,
+      "All Gear Items of '${gearCategory.name}' will be deleted too.",
+    );
+    if (delete) {
+      await dataProvider.delete(gearCategory);
+    }
+  }
+
+  Future<void> _createItem(
+    BuildContext context,
+    GearCategory gearCategory,
+    String type,
+    String name,
+    int weight,
+    GearItemDataProvider dataProvider,
+  ) async {
+    final gearItem = GearItem(
+      id: GearItemId(0),
+      gearCategoryId: gearCategory.id,
+      name: name,
+      type: type,
+      weight: weight,
+      sortIndex: 0,
+    );
+    final result = await dataProvider.create(gearItem, autoId: true);
+    if (result.isError && context.mounted) {
+      await showMessageDialog(
+        context,
+        "An Error Occurred",
+        result.error!.isUniqueViolation
+            ? "An item with the same name already exists."
+            : result.errorMessage!,
+      );
+    }
+  }
+
+  Future<void> _editItem(
+    BuildContext context,
+    GearItem gearItem,
+    GearItemDataProvider dataProvider,
+  ) async {
+    final typeNameWeight = await showTypeNameWeightDialog(
+      context,
+      gearItem.type,
+      gearItem.name,
+      gearItem.weight,
+    );
+    if (typeNameWeight != null) {
+      final (type, name, weight) = typeNameWeight;
+      final result = await dataProvider.update(
+        gearItem
+          ..type = type
+          ..name = name
+          ..weight = weight,
+      );
+      if (result.isError && context.mounted) {
+        await showMessageDialog(
+          context,
+          "An Error Occurred",
+          result.error!.isUniqueViolation
+              ? "An item with the same name already exists."
+              : result.errorMessage!,
+        );
+      }
+    }
+  }
+
+  Future<void> _deleteItem(
+    BuildContext context,
+    GearItem gearItem,
+    GearItemDataProvider dataProvider,
+  ) async {
+    final delete = await showDeleteWarningDialog(context, gearItem.name, null);
+    if (delete) {
+      await dataProvider.delete(gearItem);
+    }
   }
 }
 
