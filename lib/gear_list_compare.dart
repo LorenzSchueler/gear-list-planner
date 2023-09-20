@@ -71,7 +71,7 @@ class _GearListCompare extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Text(
-                      "Total: ${(categoriesWithItems.weight1 / 1000).toStringAsFixed(3)} - ${(categoriesWithItems.weight2 / 1000).toStringAsFixed(3)} kg",
+                      "Total: ${categoriesWithItems.weight1.inKg} - ${categoriesWithItems.weight2.inKg} kg",
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                   ],
@@ -134,7 +134,7 @@ class _CategoryCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 5),
                       Text(
-                        "${(compareItem.weight1 / 1000).toStringAsFixed(3)} - ${(compareItem.weight2 / 1000).toStringAsFixed(3)}",
+                        "${compareItem.weight1.inKg} - ${compareItem.weight2.inKg}",
                         style: Theme.of(context).textTheme.bodyLarge,
                       ),
                     ],
@@ -145,7 +145,7 @@ class _CategoryCard extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: Text(
-                "${(selectedItems.weight1 / 1000).toStringAsFixed(3)} - ${(selectedItems.weight2 / 1000).toStringAsFixed(3)} kg",
+                "${selectedItems.weight1.inKg} - ${selectedItems.weight2.inKg} kg",
                 style: Theme.of(context).textTheme.titleLarge,
                 textAlign: TextAlign.end,
               ),

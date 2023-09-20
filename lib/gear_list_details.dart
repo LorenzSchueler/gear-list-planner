@@ -129,7 +129,7 @@ class _GearListDetails extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        "Total: ${(categoriesWithItems.weight / 1000).toStringAsFixed(3)} kg",
+                        "Total: ${categoriesWithItems.weight.inKg} kg",
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
                     ],
@@ -266,7 +266,7 @@ class _CategoryCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 5),
                       Text(
-                        (gearListItemsAndItem.weight / 1000).toStringAsFixed(3),
+                        gearListItemsAndItem.weight.inKg,
                         style: Theme.of(context).textTheme.bodyLarge,
                       ),
                       IconButton(
@@ -283,7 +283,7 @@ class _CategoryCard extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: Text(
-                "${(selectedItems.weight / 1000).toStringAsFixed(3)} kg",
+                "${selectedItems.weight.inKg} kg",
                 style: Theme.of(context).textTheme.titleLarge,
                 textAlign: TextAlign.end,
               ),

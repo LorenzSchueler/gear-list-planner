@@ -592,6 +592,10 @@ extension<T> on List<T> {
   }
 }
 
+extension DoubleExtension on int {
+  String get inKg => (this / 1000).toStringAsFixed(3);
+}
+
 extension ListItemWithItem on (GearListItem, GearItem) {
   int get weight => $1.count * $2.weight;
 }
