@@ -136,6 +136,29 @@ class _AppState extends State<App> with TickerProviderStateMixin {
     });
   }
 
+  Future<void> _openFile() async {
+    final dataProvider = ModelDataProvider();
+    final empty = await dataProvider.isEmpty();
+    final open = empty ||
+        context.mounted &&
+            await showWarningDialog(
+              context,
+              "Open File?",
+              "By opening another file all current changes will be lost unless you have saved them before.",
+              "Open",
+            );
+    if (open) {
+      final result = await dataProvider.loadModel();
+      if (result.isError && mounted) {
+        await showMessageDialog(
+          context,
+          "Invalid Data",
+          result.errorMessage!,
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -148,16 +171,7 @@ class _AppState extends State<App> with TickerProviderStateMixin {
             ),
             const Spacer(),
             FilledButton.icon(
-              onPressed: () async {
-                final result = await ModelDataProvider().loadModel();
-                if (result.isError && mounted) {
-                  await showMessageDialog(
-                    context,
-                    "Invalid Data",
-                    result.errorMessage!,
-                  );
-                }
-              },
+              onPressed: _openFile,
               icon: const Icon(Icons.upload_file_rounded),
               label: const Text("Open"),
             ),

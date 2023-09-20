@@ -44,7 +44,7 @@ Future<bool> showWarningDialog(
           child: Text(
             "Cancel",
             style: TextStyle(
-              color: Theme.of(context).colorScheme.errorContainer,
+              color: Theme.of(context).colorScheme.error,
             ),
           ),
           onPressed: () => Navigator.of(context).pop(false),
@@ -53,7 +53,7 @@ Future<bool> showWarningDialog(
           child: Text(
             actionName,
             style: TextStyle(
-              color: Theme.of(context).colorScheme.error,
+              color: Theme.of(context).colorScheme.errorContainer,
             ),
           ),
           onPressed: () => Navigator.of(context).pop(true),

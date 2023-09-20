@@ -296,6 +296,10 @@ class ModelDataProvider extends ChangeNotifier {
     final data = jsonEncode(model.toJson());
     await _writeFile(data, "gear_list.json");
   }
+
+  Future<bool> isEmpty() async =>
+      (await _gearListDataProvider.getAll()).isEmpty &&
+      (await _gearCategoryDataProvider.getAll()).isEmpty;
 }
 
 class GearListOverviewDataProvider extends ChangeNotifier {
