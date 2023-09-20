@@ -81,23 +81,23 @@ class GearItemOverview extends StatelessWidget {
 }
 
 class _CategoryCard extends StatelessWidget {
-  const _CategoryCard({
+  _CategoryCard({
     required this.index,
     required this.gearCategory,
     required this.gearItems,
     required this.gearCategoryDataProvider,
     required this.gearItemDataProvider,
-  });
+  }) : super(key: ValueKey(index));
 
   final int index;
   final GearCategory gearCategory;
   final List<GearItem> gearItems;
   final GearItemDataProvider gearItemDataProvider;
   final GearCategoryDataProvider gearCategoryDataProvider;
+
   @override
   Widget build(BuildContext context) {
     return Card(
-      key: ValueKey(index),
       child: Container(
         width: 350,
         padding: const EdgeInsets.all(10),
