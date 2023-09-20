@@ -144,7 +144,7 @@ class _AppState extends State<App> with TickerProviderStateMixin {
             await showWarningDialog(
               context,
               "Open File?",
-              "By opening another file all current changes will be lost unless you have saved them before.",
+              "By opening another file all current data will be lost unless you saved it before.",
               "Open",
             );
     if (open) {
@@ -156,6 +156,18 @@ class _AppState extends State<App> with TickerProviderStateMixin {
           result.errorMessage!,
         );
       }
+    }
+  }
+
+  Future<void> _clearDb() async {
+    final clear = await showWarningDialog(
+      context,
+      "Clear All Data?",
+      "All data will be lost unless you saved it before.",
+      "Clear",
+    );
+    if (clear) {
+      await ModelDataProvider().clearDatabase();
     }
   }
 
@@ -174,6 +186,12 @@ class _AppState extends State<App> with TickerProviderStateMixin {
               onPressed: _openFile,
               icon: const Icon(Icons.upload_file_rounded),
               label: const Text("Open"),
+            ),
+            const SizedBox(width: 10),
+            FilledButton.icon(
+              onPressed: _clearDb,
+              icon: const Icon(Icons.delete_rounded),
+              label: const Text("Clear"),
             ),
             const SizedBox(width: 10),
             FilledButton.icon(

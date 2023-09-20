@@ -297,6 +297,11 @@ class ModelDataProvider extends ChangeNotifier {
     await _writeFile(data, "gear_list.json");
   }
 
+  Future<void> clearDatabase() async {
+    await AppDatabase.clearDatabase();
+    notifyListeners();
+  }
+
   Future<bool> isEmpty() async =>
       (await _gearListDataProvider.getAll()).isEmpty &&
       (await _gearCategoryDataProvider.getAll()).isEmpty;
