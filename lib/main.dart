@@ -148,6 +148,11 @@ class _AppState extends State<App> with TickerProviderStateMixin {
               "Open",
             );
     if (open) {
+      setState(() {
+        _navigationTab = Tab.listOverview;
+        _gearList = null;
+        _gearListCompare = (null, null);
+      });
       final result = await dataProvider.loadModel();
       if (result.isError && mounted) {
         await showMessageDialog(
@@ -167,6 +172,11 @@ class _AppState extends State<App> with TickerProviderStateMixin {
       "Clear",
     );
     if (clear) {
+      setState(() {
+        _navigationTab = Tab.listOverview;
+        _gearList = null;
+        _gearListCompare = (null, null);
+      });
       await ModelDataProvider().clearDatabase();
     }
   }
