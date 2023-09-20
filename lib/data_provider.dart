@@ -139,10 +139,13 @@ class GearItemDataProvider extends EntityDataProvider<GearItemId, GearItem> {
     GearItem object, {
     required bool autoId,
     bool notify = true,
+    bool autoSortIndex = true,
   }) async {
-    final maxSortIndex =
-        await tableAccessor.getMaxSortIndexForCategory(object.gearCategoryId);
-    object.sortIndex = maxSortIndex + 1;
+    if (autoSortIndex) {
+      final maxSortIndex =
+          await tableAccessor.getMaxSortIndexForCategory(object.gearCategoryId);
+      object.sortIndex = maxSortIndex + 1;
+    }
     return super.create(object, autoId: autoId, notify: notify);
   }
 
@@ -177,9 +180,12 @@ class GearCategoryDataProvider
     GearCategory object, {
     required bool autoId,
     bool notify = true,
+    bool autoSortIndex = true,
   }) async {
-    final maxSortIndex = await tableAccessor.getMaxSortIndex();
-    object.sortIndex = maxSortIndex + 1;
+    if (autoSortIndex) {
+      final maxSortIndex = await tableAccessor.getMaxSortIndex();
+      object.sortIndex = maxSortIndex + 1;
+    }
     return super.create(object, autoId: autoId, notify: notify);
   }
 }
@@ -241,6 +247,7 @@ class ModelDataProvider extends ChangeNotifier {
         gearCategory,
         autoId: false,
         notify: false,
+        autoSortIndex: false,
       );
     }
     for (final gearItem in model.gearItems) {
@@ -248,6 +255,7 @@ class ModelDataProvider extends ChangeNotifier {
         gearItem,
         autoId: false,
         notify: false,
+        autoSortIndex: false,
       );
     }
     for (final gearListItem in model.gearListItems) {
