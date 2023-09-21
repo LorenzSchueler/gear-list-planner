@@ -1,6 +1,4 @@
-// ignore_for_file: avoid_web_libraries_in_flutter
 import 'dart:convert';
-import 'dart:html' show AnchorElement;
 
 import 'package:collection/collection.dart';
 import 'package:file_picker/file_picker.dart';
@@ -9,6 +7,7 @@ import 'package:gear_list_planner/database.dart';
 import 'package:gear_list_planner/model.dart';
 import 'package:gear_list_planner/result.dart';
 import 'package:gear_list_planner/table_accessors.dart';
+import 'package:gear_list_planner/write_file.dart';
 
 abstract class EntityDataProvider<I extends Id, E extends Entity<I>>
     extends ChangeNotifier {
@@ -246,18 +245,6 @@ class ModelDataProvider extends ChangeNotifier {
     return null;
   }
 
-  Future<void> _writeFile(String data, String filename) async {
-    AnchorElement()
-      ..href = Uri.dataFromString(
-        data,
-        mimeType: "application/json",
-        encoding: Encoding.getByName("utf-8"),
-      ).toString()
-      ..style.display = "none"
-      ..download = filename
-      ..click();
-  }
-
   Future<void> _createModel(GearModel model) async {
     for (final gearList in model.gearLists) {
       await _gearListDataProvider.create(
@@ -318,7 +305,7 @@ class ModelDataProvider extends ChangeNotifier {
       gearCategories: await _gearCategoryDataProvider.getAll(),
     );
     final data = jsonEncode(model.toJson());
-    await _writeFile(data, "gear_list.json");
+    await writeFile(data, "gear_list.json");
   }
 
   Future<void> clearDatabase() async {

@@ -4,6 +4,7 @@ import 'package:gear_list_planner/data_provider.dart';
 import 'package:gear_list_planner/dialog.dart';
 import 'package:gear_list_planner/hover_scrolling_text.dart';
 import 'package:gear_list_planner/model.dart';
+import 'package:gear_list_planner/pdf_table.dart';
 import 'package:provider/provider.dart';
 
 class GearListDetailsLoadWrapper extends StatelessWidget {
@@ -83,6 +84,11 @@ class _GearListDetails extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      FilledButton(
+                        onPressed: () =>
+                            PdfTable(categoriesWithItems).exportAsPdf(),
+                        child: const Text("Export As PDF"),
+                      ),
                       Row(
                         children: [
                           Checkbox(
