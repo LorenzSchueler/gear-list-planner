@@ -29,17 +29,27 @@ class PdfTable {
     );
   }
 
-  pdf.Widget _weight(List<(GearListItem, GearItem)> items) {
+  pdf.Widget _weight(
+    List<(GearListItem, GearItem)> items, {
+    bool total = false,
+  }) {
     final weight = items.map((item) => item.$1.count * item.$2.weight).sum;
     return pdf.Row(
       mainAxisAlignment: pdf.MainAxisAlignment.end,
-      children: [
-        _spacer,
-        pdf.Text(
-          "${weight.inKg} kg",
-          style: pdf.TextStyle(fontWeight: pdf.FontWeight.bold),
-        ),
-      ],
+      children: total
+          ? [
+              pdf.Text(
+                "Total: ${weight.inKg} kg",
+                style: pdf.TextStyle(fontWeight: pdf.FontWeight.bold),
+              ),
+            ]
+          : [
+              _spacer,
+              pdf.Text(
+                "${weight.inKg} kg",
+                style: pdf.TextStyle(fontWeight: pdf.FontWeight.bold),
+              ),
+            ],
     );
   }
 
@@ -72,7 +82,7 @@ class PdfTable {
 
   pdf.Document _toPdfDocument() {
     const columnsPerPage = 5;
-    final pages = (categoriesWithItems.length / columnsPerPage).ceil();
+    final pages = ((categoriesWithItems.length + 1) / columnsPerPage).ceil();
     final rows = categoriesWithItems
             .map((categoryWithItems) => categoryWithItems.selectedItems.length)
             .maxOrNull ??
@@ -80,6 +90,7 @@ class PdfTable {
 
     final document = pdf.Document();
     for (var page = 0; page < pages; page++) {
+      final lastPage = page == pages - 1;
       final filteredCategoriesWithItems = categoriesWithItems.getRange(
         page * columnsPerPage,
         min((page + 1) * columnsPerPage, categoriesWithItems.length),
@@ -111,13 +122,21 @@ class PdfTable {
                     for (final categoryWithItems in filteredCategoriesWithItems)
                       row < categoryWithItems.selectedItems.length
                           ? _item(categoryWithItems.selectedItems[row])
-                          : pdf.Container(),
+                          : pdf.SizedBox(height: 25.43), // height of _item
                   ],
                 ),
               pdf.TableRow(
                 children: [
                   for (final categoryWithItems in filteredCategoriesWithItems)
                     _weight(categoryWithItems.selectedItems),
+                  if (lastPage)
+                    _weight(
+                      categoriesWithItems
+                          .map((c) => c.selectedItems)
+                          .flattened
+                          .toList(),
+                      total: true,
+                    ),
                 ],
               ),
             ],
