@@ -8,18 +8,21 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pdf;
 
 class PdfTable {
-  PdfTable(this.categoriesWithItems);
+  PdfTable(List<GearCategoryWithItems> categoriesWithItems)
+      : categoriesWithItems = categoriesWithItems
+            .where((c) => c.selectedItems.isNotEmpty)
+            .toList();
 
   List<GearCategoryWithItems> categoriesWithItems;
+
+  final pdf.Widget _spacer = pdf.SizedBox(width: 10);
 
   pdf.Widget _category(String name) {
     return pdf.Row(
       children: [
-        pdf.SizedBox(width: 10),
+        _spacer,
         pdf.Text(
           name,
-          softWrap: false,
-          overflow: pdf.TextOverflow.clip,
           style: pdf.TextStyle(fontWeight: pdf.FontWeight.bold),
         ),
       ],
@@ -31,7 +34,7 @@ class PdfTable {
     return pdf.Row(
       mainAxisAlignment: pdf.MainAxisAlignment.end,
       children: [
-        pdf.SizedBox(width: 10),
+        _spacer,
         pdf.Text(
           "${weight.inKg} kg",
           style: pdf.TextStyle(fontWeight: pdf.FontWeight.bold),
@@ -44,30 +47,24 @@ class PdfTable {
     final (listItem, item) = combinedItem;
     return pdf.Row(
       children: [
-        pdf.SizedBox(width: 10),
+        _spacer,
         pdf.Checkbox(value: false, name: "_"),
-        pdf.SizedBox(width: 10),
+        _spacer,
         pdf.Text(listItem.count.toString()),
-        pdf.SizedBox(width: 10),
+        _spacer,
         pdf.Expanded(
           child: pdf.Column(
             crossAxisAlignment: pdf.CrossAxisAlignment.start,
             children: [
-              pdf.Text(
-                item.type,
-                softWrap: false,
-                overflow: pdf.TextOverflow.clip,
-              ),
+              pdf.Text(item.type),
               pdf.Text(
                 item.name,
-                softWrap: false,
-                overflow: pdf.TextOverflow.clip,
                 style: const pdf.TextStyle(fontSize: 10),
               ),
             ],
           ),
         ),
-        pdf.SizedBox(width: 10),
+        _spacer,
         pdf.Text(item.weight.toString()),
       ],
     );
@@ -90,6 +87,10 @@ class PdfTable {
       final columns = filteredCategoriesWithItems.length;
       document.addPage(
         pdf.Page(
+          theme: pdf.ThemeData(
+            softWrap: false,
+            overflow: pdf.TextOverflow.clip,
+          ),
           pageFormat: PdfPageFormat.a4,
           orientation: pdf.PageOrientation.landscape,
           margin: const pdf.EdgeInsets.fromLTRB(5, 15, 15, 15),
