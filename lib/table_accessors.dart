@@ -48,8 +48,9 @@ abstract class TableAccessor<I extends Id, E extends Entity<I>> {
     return fromDbRecord(data.first);
   }
 
-  Future<List<E>> getAll() async {
-    final data = await database.query(tableName);
+  Future<List<E>> getAll(bool orderById) async {
+    final data =
+        await database.query(tableName, orderBy: orderById ? Columns.id : null);
     return data.map(fromDbRecord).toList();
   }
 
@@ -319,9 +320,9 @@ class GearCategoryAccessor extends TableAccessor<GearCategoryId, GearCategory> {
   String tableName = Tables.gearCategory;
 
   @override
-  Future<List<GearCategory>> getAll() async {
+  Future<List<GearCategory>> getAll(bool orderById) async {
     final data = await TableAccessor.database
-        .query(tableName, orderBy: Columns.sortIndex);
+        .query(tableName, orderBy: orderById ? Columns.id : Columns.sortIndex);
     return data.map(fromDbRecord).toList();
   }
 

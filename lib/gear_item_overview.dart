@@ -30,7 +30,12 @@ class GearItemOverview extends StatelessWidget {
                   gearItemDataProvider: dataProvider.gearItemDataProvider,
                 );
               },
-              onReorder: dataProvider.gearCategoryDataProvider.reorder,
+              onReorder: (oldIndex, newIndex) =>
+                  dataProvider.gearCategoryDataProvider.reorder(
+                gearCategoriesWithItems.map((c) => c.$1).toList(),
+                oldIndex,
+                newIndex,
+              ),
             ),
             SliverToBoxAdapter(
               child: Align(
@@ -193,7 +198,7 @@ class _CategoryCard extends StatelessWidget {
                 },
                 buildDefaultDragHandles: false,
                 onReorder: (oldIndex, newIndex) => gearItemDataProvider.reorder(
-                  gearCategory.id,
+                  gearItems,
                   oldIndex,
                   newIndex,
                 ),

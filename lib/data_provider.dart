@@ -51,7 +51,8 @@ abstract class EntityDataProvider<I extends Id, E extends Entity<I>>
 
   Future<E> getById(I id) => tableAccessor.getById(id);
 
-  Future<List<E>> getAll() => tableAccessor.getAll();
+  Future<List<E>> getAll({bool orderById = false}) =>
+      tableAccessor.getAll(orderById);
 }
 
 class GearListDataProvider extends EntityDataProvider<GearListId, GearList> {
@@ -163,17 +164,15 @@ class GearItemDataProvider extends EntityDataProvider<GearItemId, GearItem> {
       );
 
   Future<void> reorder(
-    GearCategoryId gearCategoryId,
+    List<GearItem> gearItems,
     int oldIndex,
     int newIndex,
   ) async {
-    final all = await getByGearCategoryId(gearCategoryId);
-
-    all
+    gearItems
       ..reorder(oldIndex, newIndex)
       ..forEachIndexed((index, item) => item..sortIndex = index);
 
-    await updateMultiple(all);
+    await updateMultiple(gearItems);
   }
 }
 
@@ -202,14 +201,16 @@ class GearCategoryDataProvider
     return super.create(object, autoId: autoId, notify: notify);
   }
 
-  Future<void> reorder(int oldIndex, int newIndex) async {
-    final all = await getAll();
-
-    all
+  Future<void> reorder(
+    List<GearCategory> gearCategories,
+    int oldIndex,
+    int newIndex,
+  ) async {
+    gearCategories
       ..reorder(oldIndex, newIndex)
       ..forEachIndexed((index, item) => item..sortIndex = index);
 
-    await updateMultiple(all);
+    await updateMultiple(gearCategories);
   }
 }
 
@@ -299,10 +300,10 @@ class ModelDataProvider extends ChangeNotifier {
 
   Future<void> storeModel() async {
     final model = GearModel(
-      gearLists: await _gearListDataProvider.getAll(),
-      gearListItems: await _gearListItemDataProvider.getAll(),
-      gearItems: await _gearItemDataProvider.getAll(),
-      gearCategories: await _gearCategoryDataProvider.getAll(),
+      gearLists: await _gearListDataProvider.getAll(orderById: true),
+      gearListItems: await _gearListItemDataProvider.getAll(orderById: true),
+      gearItems: await _gearItemDataProvider.getAll(orderById: true),
+      gearCategories: await _gearCategoryDataProvider.getAll(orderById: true),
     );
     final data = jsonEncode(model.toJson());
     await writeFile(data, "gear_list.json");
