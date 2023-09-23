@@ -85,8 +85,8 @@ class _GearListDetails extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       FilledButton(
-                        onPressed: () =>
-                            PdfTable(categoriesWithItems).exportAsPdf(),
+                        onPressed: () => PdfTable(categoriesWithItems)
+                            .exportAsPdf(compact: false),
                         child: const Text("Export As PDF"),
                       ),
                       Row(
