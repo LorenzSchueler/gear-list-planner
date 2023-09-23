@@ -236,14 +236,22 @@ class ModelDataProvider extends ChangeNotifier {
   final _gearItemDataProvider = GearItemDataProvider();
   final _gearCategoryDataProvider = GearCategoryDataProvider();
 
-  Future<String?> _readFile() async {
-    final result = await FilePicker.platform.pickFiles(withData: true);
+  Future<Result<String?>> _readFile() async {
+    final result = await FilePicker.platform.pickFiles(
+      withData: true,
+      type: FileType.custom,
+      allowedExtensions: ["json"],
+    );
     if (result != null) {
       final bytes = result.files.single.bytes!;
-      final data = utf8.decode(bytes);
-      return data;
+      try {
+        final data = utf8.decode(bytes);
+        return Result.success(data);
+      } on FormatException catch (error) {
+        return Result.error(ErrorType.invalidUtf8, error.toString());
+      }
     }
-    return null;
+    return Result.success(null);
   }
 
   Future<void> _createModel(GearModel model) async {
@@ -281,18 +289,25 @@ class ModelDataProvider extends ChangeNotifier {
   }
 
   Future<Result<void>> loadModel() async {
-    await AppDatabase.clearDatabase();
     final data = await _readFile();
-    if (data == null) {
-      return Result.success(null);
+    if (data.isError || data.success == null) {
+      return data;
     }
+    final string = data.success!;
 
-    final GearModel model;
+    final Map<String, dynamic> json;
     try {
-      model = GearModel.fromJson(jsonDecode(data) as Map<String, dynamic>);
-    } on TypeError catch (e) {
+      json = jsonDecode(string) as Map<String, dynamic>;
+    } on FormatException catch (e) {
       return Result.error(ErrorType.invalidJson, e.toString());
     }
+    final GearModel model;
+    try {
+      model = GearModel.fromJson(json);
+    } catch (e) {
+      return Result.error(ErrorType.invalidGearModel, e.toString());
+    }
+    await AppDatabase.clearDatabase();
     await _createModel(model);
     notifyListeners();
     return Result.success(null);

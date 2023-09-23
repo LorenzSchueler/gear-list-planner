@@ -35,8 +35,9 @@ class Result<T> {
 enum ErrorType {
   uniqueConstraint,
   invalidJson,
+  invalidUtf8,
+  invalidGearModel,
   unknown;
 
   bool get isUniqueViolation => this == ErrorType.uniqueConstraint;
-  bool get isInvalidJson => this == ErrorType.invalidJson;
 }
