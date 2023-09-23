@@ -7,7 +7,7 @@ import 'package:pdf/widgets.dart' as pdf;
 
 const _space = 5.0;
 const _columnsPerPage = 6;
-const _maxRowsPerColumn = 27;
+const _maxRowsPerColumn = 26;
 
 abstract class _PdfWidget {
   pdf.Widget get widget;

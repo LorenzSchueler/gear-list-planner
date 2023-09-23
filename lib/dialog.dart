@@ -64,6 +64,35 @@ Future<bool> showWarningDialog(
   return ok ?? false;
 }
 
+enum ExportMode {
+  compact,
+  sparse;
+
+  bool get isCompact => this == compact;
+}
+
+Future<ExportMode?> showExportDialog(BuildContext context) {
+  return showDialog<ExportMode>(
+    context: context,
+    builder: (_) => AlertDialog(
+      title: const Text("Choose Style"),
+      content: const Text(
+        "The compact style puts multiple categories into a single column if they fit, while the sparse style puts every category in a separate column.",
+      ),
+      actions: [
+        TextButton(
+          child: const Text("Compact"),
+          onPressed: () => Navigator.of(context).pop(ExportMode.compact),
+        ),
+        TextButton(
+          child: const Text("Sparse"),
+          onPressed: () => Navigator.of(context).pop(ExportMode.sparse),
+        ),
+      ],
+    ),
+  );
+}
+
 Future<String?> showNameDialog(
   BuildContext context,
   String? initialName,
