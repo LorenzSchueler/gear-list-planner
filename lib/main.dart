@@ -1,6 +1,3 @@
-// ignore: avoid_web_libraries_in_flutter
-import 'dart:html' as html;
-
 import 'package:flutter/material.dart';
 import 'package:gear_list_planner/data_provider.dart';
 import 'package:gear_list_planner/database.dart';
@@ -9,10 +6,9 @@ import 'package:gear_list_planner/gear_item_overview.dart';
 import 'package:gear_list_planner/gear_list_compare.dart';
 import 'package:gear_list_planner/gear_list_details.dart';
 import 'package:gear_list_planner/gear_list_overview.dart';
+import 'package:gear_list_planner/init/initializer.dart';
 import 'package:gear_list_planner/model.dart';
 import 'package:provider/provider.dart';
-import 'package:sqflite/sqflite.dart';
-import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
 
 void main() {
   runApp(const InitAppWrapper());
@@ -29,15 +25,9 @@ class _InitAppWrapperState extends State<InitAppWrapper> {
   double? _progress = 0;
 
   Future<void> initialize() async {
-    html.window.onBeforeUnload.listen((event) {
-      if (event is html.BeforeUnloadEvent) {
-        event
-          ..preventDefault()
-          ..returnValue = "do not close";
-      }
-    });
+    initializer.enableWarnOnClose();
     setState(() => _progress = 0.1);
-    databaseFactory = databaseFactoryFfiWeb;
+    initializer.setSqfliteFactory();
     await AppDatabase.init();
     setState(() => _progress = null);
   }
