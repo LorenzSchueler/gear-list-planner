@@ -1,7 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:gear_list_planner/data_provider.dart';
+import 'package:gear_list_planner/file_manager/file_manager.dart';
 import 'package:gear_list_planner/model.dart';
-import 'package:gear_list_planner/write_file.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pdf;
 
@@ -215,6 +215,6 @@ class PdfTable {
 
   Future<void> exportAsPdf({required bool compact}) async {
     final pdf = _toPdfDocument(compact);
-    await writeFileBytes(await pdf.save(), "gear_list.pdf");
+    await fileManager.writeFileBytes(await pdf.save(), null);
   }
 }

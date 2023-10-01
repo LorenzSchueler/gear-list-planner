@@ -4,10 +4,10 @@ import 'package:collection/collection.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:gear_list_planner/database.dart';
+import 'package:gear_list_planner/file_manager/file_manager.dart';
 import 'package:gear_list_planner/model.dart';
 import 'package:gear_list_planner/result.dart';
 import 'package:gear_list_planner/table_accessors.dart';
-import 'package:gear_list_planner/write_file.dart';
 
 abstract class EntityDataProvider<I extends Id, E extends Entity<I>>
     extends ChangeNotifier {
@@ -236,6 +236,8 @@ class ModelDataProvider extends ChangeNotifier {
   final _gearItemDataProvider = GearItemDataProvider();
   final _gearCategoryDataProvider = GearCategoryDataProvider();
 
+  String? _file; // filename on web, path on desktop
+
   Future<Result<String?>> _readFile() async {
     final result = await FilePicker.platform.pickFiles(
       withData: true,
@@ -243,13 +245,16 @@ class ModelDataProvider extends ChangeNotifier {
       allowedExtensions: ["json"],
     );
     if (result != null) {
-      final bytes = result.files.single.bytes!;
+      final file = result.files.single;
+
+      final String data;
       try {
-        final data = utf8.decode(bytes);
-        return Result.success(data);
+        data = utf8.decode(file.bytes!);
       } on FormatException catch (error) {
         return Result.error(ErrorType.invalidUtf8, error.toString());
       }
+      _file = kIsWeb ? file.name : file.path;
+      return Result.success(data);
     }
     return Result.success(null);
   }
@@ -321,10 +326,11 @@ class ModelDataProvider extends ChangeNotifier {
       gearCategories: await _gearCategoryDataProvider.getAll(orderById: true),
     );
     final data = jsonEncode(model.toJson());
-    await writeFile(data, "gear_list.json");
+    _file = await fileManager.writeFile(data, _file);
   }
 
   Future<void> clearDatabase() async {
+    _file = null;
     await AppDatabase.clearDatabase();
     notifyListeners();
   }
