@@ -43,7 +43,7 @@ jobs:
 
   build-web:
     name: build web
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     steps:
     - name: checkout
@@ -54,3 +54,17 @@ jobs:
         cache: true
     - name: flutter build web
       run: flutter build web --release
+
+  build-linux:
+    name: build linux
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4
+    - name: install flutter
+      uses: subosito/flutter-action@v2
+      with:
+        cache: true
+    - name: flutter build linux
+      run: flutter build linux --release
