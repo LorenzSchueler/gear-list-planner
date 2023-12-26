@@ -76,107 +76,17 @@ class _GearListDetails extends StatelessWidget {
               },
             ),
             SliverToBoxAdapter(
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 400),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      FilledButton(
-                        onPressed: () async {
-                          final style = await showExportDialog(context);
-                          if (style != null) {
-                            await PdfTable(categoriesWithItems)
-                                .exportAsPdf(compact: style.isCompact);
-                          }
-                        },
-                        child: const Text("Export As PDF"),
-                      ),
-                      Row(
-                        children: [
-                          Checkbox(
-                            value: gearList.readOnly,
-                            onChanged: (readOnly) {
-                              if (readOnly != null) {
-                                _updateList(
-                                  context,
-                                  gearList..readOnly = readOnly,
-                                );
-                              }
-                            },
-                          ),
-                          const Text("Read Only"),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Checkbox(
-                            value: unpackedOnly.isOn,
-                            onChanged: unpackedOnly.setState,
-                          ),
-                          const Text("Show Unpacked Only"),
-                        ],
-                      ),
-                      if (!gearList.readOnly)
-                        FilledButton(
-                          onPressed: () => _markAllAsUnpacked(context),
-                          child: const Text("Mark All As Unpacked"),
-                        ),
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 10),
-                          child: TextFormField(
-                            initialValue: gearList.notes,
-                            onChanged: (value) =>
-                                _updateList(context, gearList..notes = value),
-                            maxLines: null,
-                            decoration: const InputDecoration.collapsed(
-                              hintText: "Notes",
-                            ),
-                            enabled: !gearList.readOnly,
-                          ),
-                        ),
-                      ),
-                      Text(
-                        "Total: ${categoriesWithItems.weight.inKg} kg",
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                    ],
-                  ),
-                ),
+              child: _SummaryCard(
+                categoriesWithItems: categoriesWithItems,
+                gearList: gearList,
+                dataProvider: dataProvider,
+                unpackedOnly: unpackedOnly,
               ),
             ),
           ],
         ),
       ),
     );
-  }
-
-  Future<void> _updateList(BuildContext context, GearList gearList) async {
-    final result = await dataProvider.gearListDataProvider.update(gearList);
-    if (result.isError && context.mounted) {
-      await showMessageDialog(
-        context,
-        "An Error Occurred",
-        result.errorMessage!,
-      );
-    }
-  }
-
-  Future<void> _markAllAsUnpacked(BuildContext context) async {
-    final mark = await showWarningDialog(
-      context,
-      "Mark All As Unpacked?",
-      null,
-      "Mark As Unpacked",
-    );
-    if (mark) {
-      await dataProvider.gearListItemDataProvider.updateMultiple(
-        categoriesWithItems.listItems.map((e) => e..packed = false).toList(),
-      );
-    }
   }
 }
 
@@ -405,5 +315,118 @@ class _ListItemInputState extends State<_ListItemInput> {
         ),
       ],
     );
+  }
+}
+
+class _SummaryCard extends StatelessWidget {
+  const _SummaryCard({
+    required this.categoriesWithItems,
+    required this.gearList,
+    required this.dataProvider,
+    required this.unpackedOnly,
+  });
+
+  final List<GearCategoryWithItems> categoriesWithItems;
+  final GearList gearList;
+  final GearListDetailsDataProvider dataProvider;
+  final BoolToggle unpackedOnly;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 400),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            FilledButton(
+              onPressed: () async {
+                final style = await showExportDialog(context);
+                if (style != null) {
+                  await PdfTable(categoriesWithItems)
+                      .exportAsPdf(compact: style.isCompact);
+                }
+              },
+              child: const Text("Export As PDF"),
+            ),
+            Row(
+              children: [
+                Checkbox(
+                  value: gearList.readOnly,
+                  onChanged: (readOnly) {
+                    if (readOnly != null) {
+                      _updateList(
+                        context,
+                        gearList..readOnly = readOnly,
+                      );
+                    }
+                  },
+                ),
+                const Text("Read Only"),
+              ],
+            ),
+            Row(
+              children: [
+                Checkbox(
+                  value: unpackedOnly.isOn,
+                  onChanged: unpackedOnly.setState,
+                ),
+                const Text("Show Unpacked Only"),
+              ],
+            ),
+            if (!gearList.readOnly)
+              FilledButton(
+                onPressed: () => _markAllAsUnpacked(context),
+                child: const Text("Mark All As Unpacked"),
+              ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                child: TextFormField(
+                  initialValue: gearList.notes,
+                  onChanged: (value) =>
+                      _updateList(context, gearList..notes = value),
+                  maxLines: null,
+                  decoration: const InputDecoration.collapsed(
+                    hintText: "Notes",
+                  ),
+                  enabled: !gearList.readOnly,
+                ),
+              ),
+            ),
+            Text(
+              "Total: ${categoriesWithItems.weight.inKg} kg",
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _markAllAsUnpacked(BuildContext context) async {
+    final mark = await showWarningDialog(
+      context,
+      "Mark All As Unpacked?",
+      null,
+      "Mark As Unpacked",
+    );
+    if (mark) {
+      await dataProvider.gearListItemDataProvider.updateMultiple(
+        categoriesWithItems.listItems.map((e) => e..packed = false).toList(),
+      );
+    }
+  }
+
+  Future<void> _updateList(BuildContext context, GearList gearList) async {
+    final result = await dataProvider.gearListDataProvider.update(gearList);
+    if (result.isError && context.mounted) {
+      await showMessageDialog(
+        context,
+        "An Error Occurred",
+        result.errorMessage!,
+      );
+    }
   }
 }

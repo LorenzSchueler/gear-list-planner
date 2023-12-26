@@ -63,20 +63,7 @@ class _GearListCompare extends StatelessWidget {
               },
             ),
             SliverToBoxAdapter(
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Text(
-                      "Total: ${categoriesWithItems.weight1.inKg} - ${categoriesWithItems.weight2.inKg} kg",
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                  ],
-                ),
-              ),
+              child: _SummaryCard(categoriesWithItems: categoriesWithItems),
             ),
           ],
         ),
@@ -152,6 +139,31 @@ class _CategoryCard extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _SummaryCard extends StatelessWidget {
+  const _SummaryCard({
+    required this.categoriesWithItems,
+  });
+
+  final List<GearCategoryWithCompareItems> categoriesWithItems;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Text(
+            "Total: ${categoriesWithItems.weight1.inKg} - ${categoriesWithItems.weight2.inKg} kg",
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+        ],
       ),
     );
   }
