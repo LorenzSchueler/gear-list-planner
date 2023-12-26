@@ -2,65 +2,92 @@ import 'package:flutter/material.dart';
 import 'package:gear_list_planner/data_provider.dart';
 import 'package:gear_list_planner/dialog.dart';
 import 'package:gear_list_planner/hover_scrolling_text.dart';
+import 'package:gear_list_planner/main.dart';
 import 'package:gear_list_planner/model.dart';
 import 'package:provider/provider.dart';
 
 class GearItemOverview extends StatelessWidget {
   const GearItemOverview({super.key});
 
+  static Widget fab(BuildContext context) {
+    return FloatingActionButton(
+      onPressed: () => _createCategory(
+        context,
+        GearCategoryDataProvider(),
+      ),
+      child: const Icon(Icons.add_rounded),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<GearItemOverviewDataProvider>(
       builder: (context, dataProvider, _) {
         final gearCategoriesWithItems = dataProvider.gearCategoriesWithItems;
-        return CustomScrollView(
-          scrollDirection: Axis.horizontal,
-          slivers: [
-            SliverReorderableList(
-              itemCount: gearCategoriesWithItems.length,
-              itemBuilder: (context, index) {
-                final (gearCategory, gearItems) =
-                    gearCategoriesWithItems[index];
-                return _CategoryCard(
-                  index: index,
-                  gearCategory: gearCategory,
-                  gearItems: gearItems,
-                  gearCategoryDataProvider:
-                      dataProvider.gearCategoryDataProvider,
-                  gearItemDataProvider: dataProvider.gearItemDataProvider,
-                );
-              },
-              onReorder: (oldIndex, newIndex) =>
-                  dataProvider.gearCategoryDataProvider.reorder(
-                gearCategoriesWithItems.map((c) => c.$1).toList(),
-                oldIndex,
-                newIndex,
-              ),
-            ),
-            SliverToBoxAdapter(
-              child: Align(
-                alignment: Alignment.topLeft,
-                child: UnconstrainedBox(
-                  child: Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: FilledButton(
-                      onPressed: () => _createCategory(
-                        context,
+        return isMobile(context)
+            ? PageView.builder(
+                itemCount: gearCategoriesWithItems.length,
+                itemBuilder: (context, index) {
+                  final (gearCategory, gearItems) =
+                      gearCategoriesWithItems[index];
+                  return _CategoryCard(
+                    index: index,
+                    gearCategory: gearCategory,
+                    gearItems: gearItems,
+                    gearCategoryDataProvider:
                         dataProvider.gearCategoryDataProvider,
-                      ),
-                      child: const Text("Add Category"),
+                    gearItemDataProvider: dataProvider.gearItemDataProvider,
+                  );
+                },
+              )
+            : CustomScrollView(
+                scrollDirection: Axis.horizontal,
+                slivers: [
+                  SliverReorderableList(
+                    itemCount: gearCategoriesWithItems.length,
+                    itemBuilder: (context, index) {
+                      final (gearCategory, gearItems) =
+                          gearCategoriesWithItems[index];
+                      return _CategoryCard(
+                        index: index,
+                        gearCategory: gearCategory,
+                        gearItems: gearItems,
+                        gearCategoryDataProvider:
+                            dataProvider.gearCategoryDataProvider,
+                        gearItemDataProvider: dataProvider.gearItemDataProvider,
+                      );
+                    },
+                    onReorder: (oldIndex, newIndex) =>
+                        dataProvider.gearCategoryDataProvider.reorder(
+                      gearCategoriesWithItems.map((c) => c.$1).toList(),
+                      oldIndex,
+                      newIndex,
                     ),
                   ),
-                ),
-              ),
-            ),
-          ],
-        );
+                  SliverToBoxAdapter(
+                    child: Align(
+                      alignment: Alignment.topLeft,
+                      child: UnconstrainedBox(
+                        child: Padding(
+                          padding: const EdgeInsets.all(10),
+                          child: FilledButton(
+                            onPressed: () => _createCategory(
+                              context,
+                              dataProvider.gearCategoryDataProvider,
+                            ),
+                            child: const Text("Add Category"),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              );
       },
     );
   }
 
-  Future<void> _createCategory(
+  static Future<void> _createCategory(
     BuildContext context,
     GearCategoryDataProvider dataProvider,
   ) async {

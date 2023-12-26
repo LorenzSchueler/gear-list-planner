@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gear_list_planner/data_provider.dart';
-import 'package:gear_list_planner/database.dart';
+import 'package:gear_list_planner/database.dart' hide Column;
 import 'package:gear_list_planner/dialog.dart';
 import 'package:gear_list_planner/gear_item_overview.dart';
 import 'package:gear_list_planner/gear_list_compare.dart';
@@ -46,6 +46,10 @@ class _InitAppWrapperState extends State<InitAppWrapper> {
       errorContainer: Colors.green,
     ),
     appBarTheme: const AppBarTheme(color: _surface),
+    bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+      backgroundColor: _surface,
+      selectedItemColor: Colors.black,
+    ),
     navigationBarTheme: const NavigationBarThemeData(
       backgroundColor: _surface,
       surfaceTintColor: Colors.transparent,
@@ -90,13 +94,17 @@ class App extends StatefulWidget {
   State<App> createState() => _AppState();
 }
 
-enum Tab { listOverview, itemOverview, listDetails, listCompare }
+enum Tab { listOverview, itemOverview, listDetails, listCompare, openSave }
+
+bool isMobile(BuildContext context) => MediaQuery.of(context).size.width < 600;
 
 class _AppState extends State<App> with TickerProviderStateMixin {
-  Tab _navigationTab = Tab.listOverview;
+  late Tab _navigationTab = mobile ? Tab.openSave : Tab.listOverview;
 
-  bool get showDetails => _gearList != null;
-  bool get showCompare => _gearListCompare.$2 != null;
+  bool get mobile => isMobile(context);
+
+  bool get detailsChosen => _gearList != null;
+  bool get compareChosen => _gearListCompare.$2 != null;
 
   GearList? _gearList;
   void _setGearList(GearList? gearList) {
@@ -174,63 +182,65 @@ class _AppState extends State<App> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Row(
-          children: [
-            Text(
-              "Gear List Planner",
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-            const Spacer(),
-            FilledButton.icon(
-              onPressed: _openFile,
-              icon: const Icon(Icons.upload_file_rounded),
-              label: const Text("Open"),
-            ),
-            const SizedBox(width: 10),
-            FilledButton.icon(
-              onPressed: _clearDb,
-              icon: const Icon(Icons.delete_rounded),
-              label: const Text("Clear"),
-            ),
-            const SizedBox(width: 10),
-            FilledButton.icon(
-              onPressed: () => ModelDataProvider().storeModel(),
-              icon: const Icon(Icons.file_download_rounded),
-              label: const Text("Save"),
-            ),
-          ],
-        ),
-        bottom: PreferredSize(
-          preferredSize: const Size(double.infinity, 65),
-          child: NavigationBar(
-            selectedIndex: _navigationTab.index,
-            onDestinationSelected: (index) => setState(
-              () => _navigationTab = Tab.values[index],
-            ),
-            destinations: <Widget>[
-              const NavigationDestination(
-                label: "Lists",
-                icon: Icon(Icons.list_alt_rounded),
+      appBar: mobile
+          ? null
+          : AppBar(
+              title: Row(
+                children: [
+                  Text(
+                    "Gear List Planner",
+                    style: Theme.of(context).textTheme.headlineMedium,
+                  ),
+                  const Spacer(),
+                  FilledButton.icon(
+                    onPressed: _openFile,
+                    icon: const Icon(Icons.upload_file_rounded),
+                    label: const Text("Open"),
+                  ),
+                  const SizedBox(width: 10),
+                  FilledButton.icon(
+                    onPressed: _clearDb,
+                    icon: const Icon(Icons.delete_rounded),
+                    label: const Text("Clear"),
+                  ),
+                  const SizedBox(width: 10),
+                  FilledButton.icon(
+                    onPressed: () => ModelDataProvider().storeModel(),
+                    icon: const Icon(Icons.file_download_rounded),
+                    label: const Text("Save"),
+                  ),
+                ],
               ),
-              const NavigationDestination(
-                label: "Items",
-                icon: Icon(Icons.business_center_rounded),
+              bottom: PreferredSize(
+                preferredSize: const Size(double.infinity, 65),
+                child: NavigationBar(
+                  selectedIndex: _navigationTab.index,
+                  onDestinationSelected: (index) => setState(
+                    () => _navigationTab = Tab.values[index],
+                  ),
+                  destinations: <Widget>[
+                    const NavigationDestination(
+                      label: "Lists",
+                      icon: Icon(Icons.list_alt_rounded),
+                    ),
+                    const NavigationDestination(
+                      label: "Items",
+                      icon: Icon(Icons.business_center_rounded),
+                    ),
+                    NavigationDestination(
+                      label: detailsChosen ? _gearList!.name : "Details",
+                      icon: const Icon(Icons.check_box_rounded),
+                    ),
+                    NavigationDestination(
+                      label: compareChosen
+                          ? "${_gearListCompare.$1!.name} - ${_gearListCompare.$2!.name}"
+                          : "Compare",
+                      icon: const Icon(Icons.compare_rounded),
+                    ),
+                  ],
+                ),
               ),
-              NavigationDestination(
-                label: showDetails ? _gearList!.name : "Details",
-                icon: const Icon(Icons.check_box_rounded),
-              ),
-              NavigationDestination(
-                label: showCompare
-                    ? "${_gearListCompare.$1!.name} - ${_gearListCompare.$2!.name}"
-                    : "Compare",
-                icon: const Icon(Icons.compare_rounded),
-              ),
-            ],
-          ),
-        ),
-      ),
+            ),
       body: switch (_navigationTab) {
         Tab.listOverview => GearListOverview(
             onSelectGearList: _setGearList,
@@ -238,35 +248,111 @@ class _AppState extends State<App> with TickerProviderStateMixin {
             selectedCompare: _gearListCompare,
           ),
         Tab.itemOverview => const GearItemOverview(),
-        Tab.listDetails => showDetails
+        Tab.listDetails => detailsChosen
             ? GearListDetailsLoadWrapper(
                 gearListId: _gearList!.id,
               )
-            : const Center(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text("Select a list in the list overview by clicking on "),
-                    Icon(Icons.open_in_new),
-                  ],
+            : Center(
+                child: RichText(
+                  text: const TextSpan(
+                    children: [
+                      TextSpan(
+                        text:
+                            "Select a list in the list overview by clicking on ",
+                      ),
+                      WidgetSpan(
+                        child: Icon(Icons.open_in_new, size: 16),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-        Tab.listCompare => showCompare
+        Tab.listCompare => compareChosen
             ? GearListCompareLoadWrapper(
                 gearListIds: (_gearListCompare.$1!.id, _gearListCompare.$2!.id),
               )
-            : const Center(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Select two lists for comparison in the list overview by clicking on ",
-                    ),
-                    Icon(Icons.compare_rounded),
-                  ],
+            : Center(
+                child: RichText(
+                  text: const TextSpan(
+                    children: [
+                      TextSpan(
+                        text:
+                            "Select two lists for comparison in the list overview by clicking on ",
+                      ),
+                      WidgetSpan(
+                        child: Icon(Icons.compare_rounded, size: 16),
+                      ),
+                    ],
+                  ),
                 ),
               ),
+        Tab.openSave => Padding(
+            padding: const EdgeInsets.all(10),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                FilledButton.icon(
+                  onPressed: _openFile,
+                  icon: const Icon(Icons.upload_file_rounded),
+                  label: const Text("Open"),
+                ),
+                FilledButton.icon(
+                  onPressed: _clearDb,
+                  icon: const Icon(Icons.delete_rounded),
+                  label: const Text("Clear"),
+                ),
+                FilledButton.icon(
+                  onPressed: () => ModelDataProvider().storeModel(),
+                  icon: const Icon(Icons.file_download_rounded),
+                  label: const Text("Save"),
+                ),
+              ],
+            ),
+          ),
       },
+      floatingActionButton: mobile
+          ? switch (_navigationTab) {
+              Tab.listOverview => GearListOverview.fab(context),
+              Tab.itemOverview => GearItemOverview.fab(context),
+              Tab.listDetails => null,
+              Tab.listCompare => null,
+              Tab.openSave => null
+            }
+          : null,
+      bottomNavigationBar: mobile
+          ? BottomNavigationBar(
+              type: BottomNavigationBarType.fixed,
+              currentIndex: _navigationTab.index,
+              onTap: (index) => setState(
+                () => _navigationTab = Tab.values[index],
+              ),
+              items: [
+                const BottomNavigationBarItem(
+                  label: "Lists",
+                  icon: Icon(Icons.list_alt_rounded),
+                ),
+                const BottomNavigationBarItem(
+                  label: "Items",
+                  icon: Icon(Icons.business_center_rounded),
+                ),
+                BottomNavigationBarItem(
+                  label: detailsChosen ? _gearList!.name : "Details",
+                  icon: const Icon(Icons.check_box_rounded),
+                ),
+                BottomNavigationBarItem(
+                  label: compareChosen
+                      ? "${_gearListCompare.$1!.name} - ${_gearListCompare.$2!.name}"
+                      : "Compare",
+                  icon: const Icon(Icons.compare_rounded),
+                ),
+                const BottomNavigationBarItem(
+                  label: "Open / Save",
+                  icon: Icon(Icons.import_export_outlined),
+                ),
+              ],
+            )
+          : null,
     );
   }
 }

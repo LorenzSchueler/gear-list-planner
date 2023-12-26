@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gear_list_planner/bool_toggle.dart';
 import 'package:gear_list_planner/data_provider.dart';
 import 'package:gear_list_planner/hover_scrolling_text.dart';
+import 'package:gear_list_planner/main.dart';
 import 'package:gear_list_planner/model.dart';
 import 'package:provider/provider.dart';
 
@@ -46,27 +47,51 @@ class _GearListCompare extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (_) => BoolToggle.off(),
       builder: (context, _) => Consumer<BoolToggle>(
-        builder: (context, unpackedOnly, _) => CustomScrollView(
-          scrollDirection: Axis.horizontal,
-          slivers: [
-            SliverList.builder(
-              itemCount: categoriesWithItems.length,
-              itemBuilder: (context, index) {
-                final gearCategoryWithCompareItems = categoriesWithItems[index];
-                final gearCategory = gearCategoryWithCompareItems.gearCategory;
-                final selectedItems =
-                    gearCategoryWithCompareItems.selectedItems;
-                return _CategoryCard(
-                  gearCategory: gearCategory,
-                  selectedItems: selectedItems,
-                );
-              },
-            ),
-            SliverToBoxAdapter(
-              child: _SummaryCard(categoriesWithItems: categoriesWithItems),
-            ),
-          ],
-        ),
+        builder: (context, unpackedOnly, _) => isMobile(context)
+            ? PageView.builder(
+                itemCount: categoriesWithItems.length + 1,
+                itemBuilder: (context, index) {
+                  if (index == categoriesWithItems.length) {
+                    return _SummaryCard(
+                      categoriesWithItems: categoriesWithItems,
+                    );
+                  }
+                  final gearCategoryWithCompareItems =
+                      categoriesWithItems[index];
+                  final gearCategory =
+                      gearCategoryWithCompareItems.gearCategory;
+                  final selectedItems =
+                      gearCategoryWithCompareItems.selectedItems;
+                  return _CategoryCard(
+                    gearCategory: gearCategory,
+                    selectedItems: selectedItems,
+                  );
+                },
+              )
+            : CustomScrollView(
+                scrollDirection: Axis.horizontal,
+                slivers: [
+                  SliverList.builder(
+                    itemCount: categoriesWithItems.length,
+                    itemBuilder: (context, index) {
+                      final gearCategoryWithCompareItems =
+                          categoriesWithItems[index];
+                      final gearCategory =
+                          gearCategoryWithCompareItems.gearCategory;
+                      final selectedItems =
+                          gearCategoryWithCompareItems.selectedItems;
+                      return _CategoryCard(
+                        gearCategory: gearCategory,
+                        selectedItems: selectedItems,
+                      );
+                    },
+                  ),
+                  SliverToBoxAdapter(
+                    child:
+                        _SummaryCard(categoriesWithItems: categoriesWithItems),
+                  ),
+                ],
+              ),
       ),
     );
   }

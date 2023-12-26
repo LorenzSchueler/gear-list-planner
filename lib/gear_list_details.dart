@@ -3,6 +3,7 @@ import 'package:gear_list_planner/bool_toggle.dart';
 import 'package:gear_list_planner/data_provider.dart';
 import 'package:gear_list_planner/dialog.dart';
 import 'package:gear_list_planner/hover_scrolling_text.dart';
+import 'package:gear_list_planner/main.dart';
 import 'package:gear_list_planner/model.dart';
 import 'package:gear_list_planner/pdf_table.dart';
 import 'package:provider/provider.dart';
@@ -48,43 +49,79 @@ class _GearListDetails extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (_) => BoolToggle.off(),
       builder: (context, _) => Consumer<BoolToggle>(
-        builder: (context, unpackedOnly, _) => CustomScrollView(
-          scrollDirection: Axis.horizontal,
-          slivers: [
-            SliverList.builder(
-              itemCount: categoriesWithItems.length,
-              itemBuilder: (context, index) {
-                final gearCategoryWithItems = categoriesWithItems[index];
-                final gearCategory = gearCategoryWithItems.gearCategory;
-                final selectedItems = gearCategoryWithItems.selectedItems;
-                final nonSelectedItems = gearCategoryWithItems.nonSelectedItems;
-                final filteredSelectedItems = unpackedOnly.isOn
-                    ? selectedItems
-                        .where(
-                          (listItemsAndItem) => !listItemsAndItem.$1.packed,
-                        )
-                        .toList()
-                    : selectedItems;
-                return _CategoryCard(
-                  gearList: gearList,
-                  gearCategory: gearCategory,
-                  nonSelectedItems: nonSelectedItems,
-                  selectedItems: selectedItems,
-                  filteredSelectedItems: filteredSelectedItems,
-                  dataProvider: dataProvider.gearListItemDataProvider,
-                );
-              },
-            ),
-            SliverToBoxAdapter(
-              child: _SummaryCard(
-                categoriesWithItems: categoriesWithItems,
-                gearList: gearList,
-                dataProvider: dataProvider,
-                unpackedOnly: unpackedOnly,
+        builder: (context, unpackedOnly, _) => isMobile(context)
+            ? PageView.builder(
+                itemCount: categoriesWithItems.length + 1,
+                itemBuilder: (context, index) {
+                  if (index == categoriesWithItems.length) {
+                    return _SummaryCard(
+                      categoriesWithItems: categoriesWithItems,
+                      gearList: gearList,
+                      dataProvider: dataProvider,
+                      unpackedOnly: unpackedOnly,
+                    );
+                  }
+                  final gearCategoryWithItems = categoriesWithItems[index];
+                  final gearCategory = gearCategoryWithItems.gearCategory;
+                  final selectedItems = gearCategoryWithItems.selectedItems;
+                  final nonSelectedItems =
+                      gearCategoryWithItems.nonSelectedItems;
+                  final filteredSelectedItems = unpackedOnly.isOn
+                      ? selectedItems
+                          .where(
+                            (listItemsAndItem) => !listItemsAndItem.$1.packed,
+                          )
+                          .toList()
+                      : selectedItems;
+                  return _CategoryCard(
+                    gearList: gearList,
+                    gearCategory: gearCategory,
+                    nonSelectedItems: nonSelectedItems,
+                    selectedItems: selectedItems,
+                    filteredSelectedItems: filteredSelectedItems,
+                    dataProvider: dataProvider.gearListItemDataProvider,
+                  );
+                },
+              )
+            : CustomScrollView(
+                scrollDirection: Axis.horizontal,
+                slivers: [
+                  SliverList.builder(
+                    itemCount: categoriesWithItems.length,
+                    itemBuilder: (context, index) {
+                      final gearCategoryWithItems = categoriesWithItems[index];
+                      final gearCategory = gearCategoryWithItems.gearCategory;
+                      final selectedItems = gearCategoryWithItems.selectedItems;
+                      final nonSelectedItems =
+                          gearCategoryWithItems.nonSelectedItems;
+                      final filteredSelectedItems = unpackedOnly.isOn
+                          ? selectedItems
+                              .where(
+                                (listItemsAndItem) =>
+                                    !listItemsAndItem.$1.packed,
+                              )
+                              .toList()
+                          : selectedItems;
+                      return _CategoryCard(
+                        gearList: gearList,
+                        gearCategory: gearCategory,
+                        nonSelectedItems: nonSelectedItems,
+                        selectedItems: selectedItems,
+                        filteredSelectedItems: filteredSelectedItems,
+                        dataProvider: dataProvider.gearListItemDataProvider,
+                      );
+                    },
+                  ),
+                  SliverToBoxAdapter(
+                    child: _SummaryCard(
+                      categoriesWithItems: categoriesWithItems,
+                      gearList: gearList,
+                      dataProvider: dataProvider,
+                      unpackedOnly: unpackedOnly,
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ],
-        ),
       ),
     );
   }
