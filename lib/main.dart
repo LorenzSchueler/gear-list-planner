@@ -134,6 +134,8 @@ class _AppState extends State<App> with TickerProviderStateMixin {
     });
   }
 
+  bool _isOpening = false;
+
   Future<void> _openFile() async {
     final dataProvider = ModelDataProvider();
     final empty = await dataProvider.isEmpty();
@@ -147,6 +149,7 @@ class _AppState extends State<App> with TickerProviderStateMixin {
             );
     if (open) {
       setState(() {
+        _isOpening = true;
         _navigationTab = Tab.listOverview;
         _gearList = null;
         _gearListCompare = (null, null);
@@ -159,6 +162,7 @@ class _AppState extends State<App> with TickerProviderStateMixin {
           result.errorMessage!,
         );
       }
+      setState(() => _isOpening = false);
     }
   }
 
@@ -241,76 +245,81 @@ class _AppState extends State<App> with TickerProviderStateMixin {
                 ),
               ),
             ),
-      body: switch (_navigationTab) {
-        Tab.listOverview => GearListOverview(
-            onSelectGearList: _setGearList,
-            onToggleCompareGearList: _toggleCompareGearList,
-            selectedCompare: _gearListCompare,
-          ),
-        Tab.itemOverview => const GearItemOverview(),
-        Tab.listDetails => detailsChosen
-            ? GearListDetailsLoadWrapper(
-                gearListId: _gearList!.id,
-              )
-            : Center(
-                child: RichText(
-                  text: const TextSpan(
-                    children: [
-                      TextSpan(
-                        text:
-                            "Select a list in the list overview by clicking on ",
+      body: _isOpening
+          ? const Center(child: CircularProgressIndicator())
+          : switch (_navigationTab) {
+              Tab.listOverview => GearListOverview(
+                  onSelectGearList: _setGearList,
+                  onToggleCompareGearList: _toggleCompareGearList,
+                  selectedCompare: _gearListCompare,
+                ),
+              Tab.itemOverview => const GearItemOverview(),
+              Tab.listDetails => detailsChosen
+                  ? GearListDetailsLoadWrapper(
+                      gearListId: _gearList!.id,
+                    )
+                  : Center(
+                      child: RichText(
+                        text: const TextSpan(
+                          children: [
+                            TextSpan(
+                              text:
+                                  "Select a list in the list overview by clicking on ",
+                            ),
+                            WidgetSpan(
+                              child: Icon(Icons.open_in_new, size: 16),
+                            ),
+                          ],
+                        ),
                       ),
-                      WidgetSpan(
-                        child: Icon(Icons.open_in_new, size: 16),
+                    ),
+              Tab.listCompare => compareChosen
+                  ? GearListCompareLoadWrapper(
+                      gearListIds: (
+                        _gearListCompare.$1!.id,
+                        _gearListCompare.$2!.id
+                      ),
+                    )
+                  : Center(
+                      child: RichText(
+                        text: const TextSpan(
+                          children: [
+                            TextSpan(
+                              text:
+                                  "Select two lists for comparison in the list overview by clicking on ",
+                            ),
+                            WidgetSpan(
+                              child: Icon(Icons.compare_rounded, size: 16),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+              Tab.openSave => Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      FilledButton.icon(
+                        onPressed: _openFile,
+                        icon: const Icon(Icons.upload_file_rounded),
+                        label: const Text("Open"),
+                      ),
+                      FilledButton.icon(
+                        onPressed: _clearDb,
+                        icon: const Icon(Icons.delete_rounded),
+                        label: const Text("Clear"),
+                      ),
+                      FilledButton.icon(
+                        onPressed: () => ModelDataProvider().storeModel(),
+                        icon: const Icon(Icons.file_download_rounded),
+                        label: const Text("Save"),
                       ),
                     ],
                   ),
                 ),
-              ),
-        Tab.listCompare => compareChosen
-            ? GearListCompareLoadWrapper(
-                gearListIds: (_gearListCompare.$1!.id, _gearListCompare.$2!.id),
-              )
-            : Center(
-                child: RichText(
-                  text: const TextSpan(
-                    children: [
-                      TextSpan(
-                        text:
-                            "Select two lists for comparison in the list overview by clicking on ",
-                      ),
-                      WidgetSpan(
-                        child: Icon(Icons.compare_rounded, size: 16),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-        Tab.openSave => Padding(
-            padding: const EdgeInsets.all(10),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                FilledButton.icon(
-                  onPressed: _openFile,
-                  icon: const Icon(Icons.upload_file_rounded),
-                  label: const Text("Open"),
-                ),
-                FilledButton.icon(
-                  onPressed: _clearDb,
-                  icon: const Icon(Icons.delete_rounded),
-                  label: const Text("Clear"),
-                ),
-                FilledButton.icon(
-                  onPressed: () => ModelDataProvider().storeModel(),
-                  icon: const Icon(Icons.file_download_rounded),
-                  label: const Text("Save"),
-                ),
-              ],
-            ),
-          ),
-      },
+            },
       floatingActionButton: mobile
           ? switch (_navigationTab) {
               Tab.listOverview => GearListOverview.fab(context),
