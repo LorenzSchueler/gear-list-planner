@@ -140,7 +140,7 @@ class _AppState extends State<App> with TickerProviderStateMixin {
     final dataProvider = ModelDataProvider();
     final empty = await dataProvider.isEmpty();
     final open = empty ||
-        context.mounted &&
+        mounted &&
             await showWarningDialog(
               context,
               "Open File?",
