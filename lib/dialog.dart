@@ -144,7 +144,7 @@ class _NameDialogState extends State<_NameDialog> {
         actions: [
           TextButton(
             child: const Text("Cancel"),
-            onPressed: () => Navigator.of(context).pop(null),
+            onPressed: () => Navigator.of(context).pop(),
           ),
           TextButton(
             onPressed: _formKey.currentState?.validate() ?? false
@@ -254,7 +254,7 @@ class _TypeNameWeightDialogState extends State<_TypeNameWeightDialog> {
         actions: [
           TextButton(
             child: const Text("Cancel"),
-            onPressed: () => Navigator.of(context).pop(null),
+            onPressed: () => Navigator.of(context).pop(),
           ),
           TextButton(
             onPressed: _formKey.currentState?.validate() ?? false
@@ -337,7 +337,7 @@ class _CloneDialogState extends State<_CloneDialog> {
         actions: [
           TextButton(
             child: const Text("Cancel"),
-            onPressed: () => Navigator.of(context).pop(null),
+            onPressed: () => Navigator.of(context).pop(),
           ),
           TextButton(
             onPressed: _formKey.currentState?.validate() ?? false
