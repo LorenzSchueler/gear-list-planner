@@ -55,6 +55,20 @@ jobs:
     - name: flutter build web
       run: flutter build web --release
 
+  build-web-wasm:
+    name: build web wasm
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4
+    - name: install flutter
+      uses: subosito/flutter-action@v2
+      with:
+        cache: true
+    - name: flutter build web
+      run: flutter build web --wasm --release
+
   build-linux:
     name: build linux
     runs-on: ubuntu-20.04

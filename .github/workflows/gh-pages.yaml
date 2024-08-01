@@ -34,7 +34,7 @@ jobs:
         with:
           cache: true
       - name: flutter build web
-        run: flutter build web --release --base-href /gear-list-planner/
+        run: flutter build web --wasm --release --base-href /gear-list-planner/
       - name: configure pages
         uses: actions/configure-pages@v5
       - name: upload artifact
