@@ -26,7 +26,7 @@ jobs:
       run: dart format --set-exit-if-changed .
 
   analyze:
-    name: analize
+    name: analyze
     runs-on: ubuntu-latest
 
     steps:
@@ -71,7 +71,7 @@ jobs:
 
   build-linux:
     name: build linux
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     steps:
     - name: checkout
