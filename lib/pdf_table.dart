@@ -25,22 +25,21 @@ class Category extends _PdfWidget {
 
   @override
   pdf.Widget get widget => pdf.Row(
-        children: [
-          _startSpacer,
-          pdf.Text(
-            name,
-            style: pdf.TextStyle(fontWeight: pdf.FontWeight.bold),
-          ),
-        ],
-      );
+    children: [
+      _startSpacer,
+      pdf.Text(name, style: pdf.TextStyle(fontWeight: pdf.FontWeight.bold)),
+    ],
+  );
 }
 
 class _Weight extends _PdfWidget {
   _Weight(this.items) : total = false;
   _Weight.total(List<GearCategoryWithItems> categoriesWithItems)
-      : items =
-            categoriesWithItems.map((c) => c.selectedItems).flattened.toList(),
-        total = true;
+    : items = categoriesWithItems
+          .map((c) => c.selectedItems)
+          .flattened
+          .toList(),
+      total = true;
 
   List<(GearListItem, GearItem)> items;
   bool total;
@@ -48,14 +47,14 @@ class _Weight extends _PdfWidget {
 
   @override
   pdf.Widget get widget => pdf.Row(
-        mainAxisAlignment: pdf.MainAxisAlignment.end,
-        children: [
-          pdf.Text(
-            total ? "Total: ${weight.inKg} kg" : "${weight.inKg} kg",
-            style: pdf.TextStyle(fontWeight: pdf.FontWeight.bold),
-          ),
-        ],
-      );
+    mainAxisAlignment: pdf.MainAxisAlignment.end,
+    children: [
+      pdf.Text(
+        total ? "Total: ${weight.inKg} kg" : "${weight.inKg} kg",
+        style: pdf.TextStyle(fontWeight: pdf.FontWeight.bold),
+      ),
+    ],
+  );
 }
 
 class _Item extends _PdfWidget {
@@ -65,28 +64,28 @@ class _Item extends _PdfWidget {
 
   @override
   pdf.Widget get widget => pdf.Row(
-        children: [
-          _startSpacer,
-          pdf.Checkbox(value: false, name: "_", height: 10, width: 10),
-          _spacer,
-          pdf.Text(combinedItem.$1.count.toString()),
-          _spacer,
-          pdf.Expanded(
-            child: pdf.Column(
-              crossAxisAlignment: pdf.CrossAxisAlignment.start,
-              children: [
-                pdf.Text(combinedItem.$2.type),
-                pdf.Text(
-                  combinedItem.$2.name,
-                  style: const pdf.TextStyle(fontSize: 8),
-                ),
-              ],
+    children: [
+      _startSpacer,
+      pdf.Checkbox(value: false, name: "_", height: 10, width: 10),
+      _spacer,
+      pdf.Text(combinedItem.$1.count.toString()),
+      _spacer,
+      pdf.Expanded(
+        child: pdf.Column(
+          crossAxisAlignment: pdf.CrossAxisAlignment.start,
+          children: [
+            pdf.Text(combinedItem.$2.type),
+            pdf.Text(
+              combinedItem.$2.name,
+              style: const pdf.TextStyle(fontSize: 8),
             ),
-          ),
-          _spacer,
-          pdf.Text(combinedItem.$2.weight.toString()),
-        ],
-      );
+          ],
+        ),
+      ),
+      _spacer,
+      pdf.Text(combinedItem.$2.weight.toString()),
+    ],
+  );
 }
 
 class _Placeholder extends _PdfWidget {
@@ -128,13 +127,13 @@ extension on List<GearCategoryWithItems> {
 
 extension on GearCategoryWithItems {
   List<_PdfWidget> toWidgets(bool compact, int maxItems) => [
-        Category(gearCategory.name),
-        ...selectedItems.map(_Item.new),
-        if (!compact) ...[
-          for (var i = selectedItems.length; i < maxItems; i++) _Placeholder(),
-        ],
-        _Weight(selectedItems),
-      ];
+    Category(gearCategory.name),
+    ...selectedItems.map(_Item.new),
+    if (!compact) ...[
+      for (var i = selectedItems.length; i < maxItems; i++) _Placeholder(),
+    ],
+    _Weight(selectedItems),
+  ];
 }
 
 extension on List<List<_PdfWidget>> {
@@ -144,13 +143,16 @@ extension on List<List<_PdfWidget>> {
     for (var rowIndex = 0; rowIndex < rowCount; rowIndex++) {
       final row = <_PdfWidget>[];
       for (final column in this) {
-        final item =
-            rowIndex < column.length ? column[rowIndex] : _Placeholder();
+        final item = rowIndex < column.length
+            ? column[rowIndex]
+            : _Placeholder();
         row.add(item);
       }
-      for (var itemCount = row.length % _columnsPerPage;
-          itemCount < _columnsPerPage;
-          itemCount++) {
+      for (
+        var itemCount = row.length % _columnsPerPage;
+        itemCount < _columnsPerPage;
+        itemCount++
+      ) {
         row.add(_Placeholder());
       }
       rowTable.add(row);

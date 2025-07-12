@@ -55,10 +55,7 @@ class GearListOverview extends StatelessWidget {
                   child: Column(
                     children: [
                       FilledButton.icon(
-                        onPressed: () => _createList(
-                          context,
-                          dataProvider,
-                        ),
+                        onPressed: () => _createList(context, dataProvider),
                         icon: const Icon(Icons.add_rounded),
                         label: const Text("Add List"),
                       ),
@@ -94,8 +91,10 @@ class GearListOverview extends StatelessWidget {
       final (name, cloneListId) = newList;
       final Result<void> result;
       if (cloneListId != null) {
-        result = await dataProvider.gearListDataProvider
-            .cloneList(name, cloneListId);
+        result = await dataProvider.gearListDataProvider.cloneList(
+          name,
+          cloneListId,
+        );
       } else {
         final gearList = GearList(
           id: GearListId(0),
@@ -103,8 +102,10 @@ class GearListOverview extends StatelessWidget {
           notes: "",
           readOnly: false,
         );
-        result = await dataProvider.gearListDataProvider
-            .create(gearList, autoId: true);
+        result = await dataProvider.gearListDataProvider.create(
+          gearList,
+          autoId: true,
+        );
       }
       if (result.isError && context.mounted) {
         await showMessageDialog(
@@ -150,17 +151,11 @@ class ListItem extends StatelessWidget {
           icon: const Icon(Icons.open_in_new),
         ),
         IconButton(
-          onPressed: () => _editList(
-            context,
-            gearList,
-          ),
+          onPressed: () => _editList(context, gearList),
           icon: const Icon(Icons.edit_rounded),
         ),
         IconButton(
-          onPressed: () => _deleteList(
-            context,
-            gearList,
-          ),
+          onPressed: () => _deleteList(context, gearList),
           icon: const Icon(Icons.delete_rounded),
         ),
         IconButton(

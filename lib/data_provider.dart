@@ -65,31 +65,21 @@ class GearListDataProvider extends EntityDataProvider<GearListId, GearList> {
   @override
   final GearListAccessor tableAccessor = GearListAccessor();
 
-  Future<Result<void>> cloneList(
-    String name,
-    GearListId cloneId,
-  ) async {
+  Future<Result<void>> cloneList(String name, GearListId cloneId) async {
     final result = await create(
-      GearList(
-        id: GearListId(0),
-        name: name,
-        notes: "",
-        readOnly: false,
-      ),
+      GearList(id: GearListId(0), name: name, notes: "", readOnly: false),
       autoId: true,
     );
     if (result.isError) {
       return result;
     }
     final id = result.success;
-    await TableAccessor.database.execute(
-      """
+    await TableAccessor.database.execute("""
       insert into ${Tables.gearListItem}(${Columns.gearItemId}, ${Columns.gearListId}, ${Columns.count}, ${Columns.packed}) 
       select ${Columns.gearItemId}, $id, ${Columns.count}, ${Columns.packed}
       from ${Tables.gearListItem} 
       where ${Columns.gearListId} = ${cloneId.id};
-      """,
-    );
+      """);
     return Result.success(null);
   }
 }
@@ -108,20 +98,12 @@ class GearListItemDataProvider
   Future<List<(GearListItem, GearItem)>> getWithItemByListAndCategory(
     GearListId gearListId,
     GearCategoryId gearCategoryId,
-  ) =>
-      tableAccessor.getWithItemByListAndCategory(
-        gearListId,
-        gearCategoryId,
-      );
+  ) => tableAccessor.getWithItemByListAndCategory(gearListId, gearCategoryId);
 
   Future<List<CompareItem>> getWithItemByListsAndCategory(
     (GearListId, GearListId) gearListIds,
     GearCategoryId gearCategoryId,
-  ) =>
-      tableAccessor.getWithItemByListsAndCategory(
-        gearListIds,
-        gearCategoryId,
-      );
+  ) => tableAccessor.getWithItemByListsAndCategory(gearListIds, gearCategoryId);
 }
 
 class GearItemDataProvider extends EntityDataProvider<GearItemId, GearItem> {
@@ -142,26 +124,24 @@ class GearItemDataProvider extends EntityDataProvider<GearItemId, GearItem> {
     bool autoSortIndex = true,
   }) async {
     if (autoSortIndex) {
-      final maxSortIndex =
-          await tableAccessor.getMaxSortIndexForCategory(object.gearCategoryId);
+      final maxSortIndex = await tableAccessor.getMaxSortIndexForCategory(
+        object.gearCategoryId,
+      );
       object.sortIndex = maxSortIndex + 1;
     }
     return super.create(object, autoId: autoId, notify: notify);
   }
 
-  Future<List<GearItem>> getByGearCategoryId(
-    GearCategoryId gearCategoryId,
-  ) =>
+  Future<List<GearItem>> getByGearCategoryId(GearCategoryId gearCategoryId) =>
       tableAccessor.getByGearCategoryId(gearCategoryId);
 
   Future<List<GearItem>> getNonSelectedByGearCategoryIdAndListId(
     GearCategoryId gearCategoryId,
     GearListId gearListId,
-  ) =>
-      tableAccessor.getNonSelectedByGearCategoryIdAndListId(
-        gearCategoryId,
-        gearListId,
-      );
+  ) => tableAccessor.getNonSelectedByGearCategoryIdAndListId(
+    gearCategoryId,
+    gearListId,
+  );
 
   Future<void> reorder(
     List<GearItem> gearItems,
@@ -396,17 +376,16 @@ class GearItemOverviewDataProvider extends ChangeNotifier {
       _gearCategoriesWithItems;
 
   Future<void> _onUpdate() async {
-    final gearCategories =
-        await _dataProvider._gearCategoryDataProvider.getAll();
+    final gearCategories = await _dataProvider._gearCategoryDataProvider
+        .getAll();
     final gearCategoriesWithItems = <(GearCategory, List<GearItem>)>[];
     for (final gearCategory in gearCategories) {
-      gearCategoriesWithItems.add(
-        (
-          gearCategory,
-          await _dataProvider._gearItemDataProvider
-              .getByGearCategoryId(gearCategory.id)
+      gearCategoriesWithItems.add((
+        gearCategory,
+        await _dataProvider._gearItemDataProvider.getByGearCategoryId(
+          gearCategory.id,
         ),
-      );
+      ));
     }
     _gearCategoriesWithItems = gearCategoriesWithItems;
     notifyListeners();
@@ -470,26 +449,23 @@ class GearListDetailsDataProvider extends ChangeNotifier {
     if (_gearListId == null) {
       return;
     }
-    final gearList =
-        await _dataProvider._gearListDataProvider.getById(_gearListId!);
-    final gearCategories =
-        await _dataProvider._gearCategoryDataProvider.getAll();
+    final gearList = await _dataProvider._gearListDataProvider.getById(
+      _gearListId!,
+    );
+    final gearCategories = await _dataProvider._gearCategoryDataProvider
+        .getAll();
     final categoriesWithItems = <GearCategoryWithItems>[];
     for (final gearCategory in gearCategories) {
-      final gearItems =
-          await gearItemDataProvider.getNonSelectedByGearCategoryIdAndListId(
-        gearCategory.id,
-        _gearListId!,
-      );
+      final gearItems = await gearItemDataProvider
+          .getNonSelectedByGearCategoryIdAndListId(
+            gearCategory.id,
+            _gearListId!,
+          );
       final gearListItemsWithItems = await _dataProvider
           ._gearListItemDataProvider
           .getWithItemByListAndCategory(_gearListId!, gearCategory.id);
       categoriesWithItems.add(
-        GearCategoryWithItems(
-          gearCategory,
-          gearItems,
-          gearListItemsWithItems,
-        ),
+        GearCategoryWithItems(gearCategory, gearItems, gearListItemsWithItems),
       );
     }
 
@@ -499,10 +475,7 @@ class GearListDetailsDataProvider extends ChangeNotifier {
 }
 
 class GearCategoryWithCompareItems {
-  GearCategoryWithCompareItems(
-    this.gearCategory,
-    this.selectedItems,
-  );
+  GearCategoryWithCompareItems(this.gearCategory, this.selectedItems);
 
   final GearCategory gearCategory;
   final List<CompareItem> selectedItems;
@@ -565,20 +538,19 @@ class GearListCompareDataProvider extends ChangeNotifier {
       notifyListeners();
       return;
     }
-    final gearList1 =
-        await _dataProvider._gearListDataProvider.getById(_gearListIds!.$1);
-    final gearList2 =
-        await _dataProvider._gearListDataProvider.getById(_gearListIds!.$2);
-    final gearListCategories =
-        await _dataProvider._gearCategoryDataProvider.getAll();
+    final gearList1 = await _dataProvider._gearListDataProvider.getById(
+      _gearListIds!.$1,
+    );
+    final gearList2 = await _dataProvider._gearListDataProvider.getById(
+      _gearListIds!.$2,
+    );
+    final gearListCategories = await _dataProvider._gearCategoryDataProvider
+        .getAll();
     final categoriesWithItems = <GearCategoryWithCompareItems>[];
     for (final gearCategory in gearListCategories) {
       final gearListItemsWithItems = await _dataProvider
           ._gearListItemDataProvider
-          .getWithItemByListsAndCategory(
-        _gearListIds!,
-        gearCategory.id,
-      );
+          .getWithItemByListsAndCategory(_gearListIds!, gearCategory.id);
       categoriesWithItems.add(
         GearCategoryWithCompareItems(gearCategory, gearListItemsWithItems),
       );

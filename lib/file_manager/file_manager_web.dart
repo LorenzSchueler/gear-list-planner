@@ -24,10 +24,7 @@ class FileManagerWeb implements FileManager {
   Future<String?> writeFileBytes(Uint8List data, String? file) async {
     final filename = file ?? "gear_list.pdf";
     HTMLAnchorElement()
-      ..href = Uri.dataFromBytes(
-        data,
-        mimeType: "application/pdf",
-      ).toString()
+      ..href = Uri.dataFromBytes(data, mimeType: "application/pdf").toString()
       ..style.display = "none"
       ..download = filename
       ..click();

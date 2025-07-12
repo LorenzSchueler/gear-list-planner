@@ -49,8 +49,10 @@ abstract class TableAccessor<I extends Id, E extends Entity<I>> {
   }
 
   Future<List<E>> getAll(bool orderById) async {
-    final data =
-        await database.query(tableName, orderBy: orderById ? Columns.id : null);
+    final data = await database.query(
+      tableName,
+      orderBy: orderById ? Columns.id : null,
+    );
     return data.map(fromDbRecord).toList();
   }
 
@@ -102,32 +104,17 @@ class GearListItemAccessor extends TableAccessor<GearListItemId, GearListItem> {
     GearListId gearListId,
     GearCategoryId gearCategoryId,
   ) async {
-    final data = await TableAccessor.database.rawQuery(
-      """
+    final data = await TableAccessor.database.rawQuery("""
       select 
-        ${_fullyQualifiedNames(Tables.gearListItem, [
-            Columns.id,
-            Columns.gearItemId,
-            Columns.gearListId,
-            Columns.count,
-            Columns.packed,
-          ])},
-        ${_fullyQualifiedNames(Tables.gearItem, [
-            Columns.id,
-            Columns.gearCategoryId,
-            Columns.type,
-            Columns.name,
-            Columns.weight,
-            Columns.sortIndex,
-          ])}
+        ${_fullyQualifiedNames(Tables.gearListItem, [Columns.id, Columns.gearItemId, Columns.gearListId, Columns.count, Columns.packed])},
+        ${_fullyQualifiedNames(Tables.gearItem, [Columns.id, Columns.gearCategoryId, Columns.type, Columns.name, Columns.weight, Columns.sortIndex])}
       from ${Tables.gearListItem}
       inner join ${Tables.gearItem}
       on ${Tables.gearListItem}.${Columns.gearItemId} = ${Tables.gearItem}.${Columns.id}
       where ${Tables.gearListItem}.${Columns.gearListId} = ${gearListId.id}
       and ${Tables.gearItem}.${Columns.gearCategoryId} = ${gearCategoryId.id}
       order by ${Tables.gearItem}.${Columns.sortIndex};
-      """,
-    );
+      """);
     return data.map((joined) {
       final gearListItem = fromDbRecord(
         Map.fromEntries(
@@ -162,31 +149,11 @@ class GearListItemAccessor extends TableAccessor<GearListItemId, GearListItem> {
     GearCategoryId gearCategoryId,
   ) async {
     const tableGearListItem2 = "gear_list_item_2";
-    final data = await TableAccessor.database.rawQuery(
-      """
+    final data = await TableAccessor.database.rawQuery("""
       select 
-        ${_fullyQualifiedNames(Tables.gearListItem, [
-            Columns.id,
-            Columns.gearItemId,
-            Columns.gearListId,
-            Columns.count,
-            Columns.packed,
-          ])},
-        ${_fullyQualifiedNames(tableGearListItem2, [
-            Columns.id,
-            Columns.gearItemId,
-            Columns.gearListId,
-            Columns.count,
-            Columns.packed,
-          ])},
-        ${_fullyQualifiedNames(Tables.gearItem, [
-            Columns.id,
-            Columns.gearCategoryId,
-            Columns.type,
-            Columns.name,
-            Columns.weight,
-            Columns.sortIndex,
-          ])}
+        ${_fullyQualifiedNames(Tables.gearListItem, [Columns.id, Columns.gearItemId, Columns.gearListId, Columns.count, Columns.packed])},
+        ${_fullyQualifiedNames(tableGearListItem2, [Columns.id, Columns.gearItemId, Columns.gearListId, Columns.count, Columns.packed])},
+        ${_fullyQualifiedNames(Tables.gearItem, [Columns.id, Columns.gearCategoryId, Columns.type, Columns.name, Columns.weight, Columns.sortIndex])}
       from ${Tables.gearItem}
       left outer join (
         select * from ${Tables.gearListItem}
@@ -200,49 +167,45 @@ class GearListItemAccessor extends TableAccessor<GearListItemId, GearListItem> {
       on $tableGearListItem2.${Columns.gearItemId} = ${Tables.gearItem}.${Columns.id}
       where ${Tables.gearItem}.${Columns.gearCategoryId} = ${gearCategoryId.id}
       order by ${Tables.gearItem}.${Columns.sortIndex};
-      """,
-    );
+      """);
     return data
         .map((joined) {
           final gearListItem1 =
               joined["${Tables.gearListItem}.${Columns.id}"] != null
-                  ? fromDbRecord(
-                      Map.fromEntries(
-                        joined.entries
-                            .where(
-                              (element) =>
-                                  element.key.startsWith(Tables.gearListItem),
-                            )
-                            .map(
-                              (e) => MapEntry(
-                                e.key.replaceFirst(
-                                  "${Tables.gearListItem}.",
-                                  "",
-                                ),
-                                e.value,
-                              ),
-                            ),
-                      ),
-                    )
-                  : null;
+              ? fromDbRecord(
+                  Map.fromEntries(
+                    joined.entries
+                        .where(
+                          (element) =>
+                              element.key.startsWith(Tables.gearListItem),
+                        )
+                        .map(
+                          (e) => MapEntry(
+                            e.key.replaceFirst("${Tables.gearListItem}.", ""),
+                            e.value,
+                          ),
+                        ),
+                  ),
+                )
+              : null;
           final gearListItem2 =
               joined["$tableGearListItem2.${Columns.id}"] != null
-                  ? fromDbRecord(
-                      Map.fromEntries(
-                        joined.entries
-                            .where(
-                              (element) =>
-                                  element.key.startsWith(tableGearListItem2),
-                            )
-                            .map(
-                              (e) => MapEntry(
-                                e.key.replaceFirst("$tableGearListItem2.", ""),
-                                e.value,
-                              ),
-                            ),
-                      ),
-                    )
-                  : null;
+              ? fromDbRecord(
+                  Map.fromEntries(
+                    joined.entries
+                        .where(
+                          (element) =>
+                              element.key.startsWith(tableGearListItem2),
+                        )
+                        .map(
+                          (e) => MapEntry(
+                            e.key.replaceFirst("$tableGearListItem2.", ""),
+                            e.value,
+                          ),
+                        ),
+                  ),
+                )
+              : null;
           final gearItem = GearItemAccessor().fromDbRecord(
             Map.fromEntries(
               joined.entries
@@ -272,9 +235,7 @@ class GearItemAccessor extends TableAccessor<GearItemId, GearItem> {
   @override
   String tableName = Tables.gearItem;
 
-  Future<int> getMaxSortIndexForCategory(
-    GearCategoryId gearCategoryId,
-  ) async {
+  Future<int> getMaxSortIndexForCategory(GearCategoryId gearCategoryId) async {
     final id = await TableAccessor.database.query(
       Tables.gearItem,
       columns: ["max(${Columns.sortIndex}) as max_sort_index"],
@@ -302,7 +263,8 @@ class GearItemAccessor extends TableAccessor<GearItemId, GearItem> {
   ) async {
     final data = await TableAccessor.database.query(
       tableName,
-      where: "${Columns.gearCategoryId} = ? and "
+      where:
+          "${Columns.gearCategoryId} = ? and "
           "not exists (select * from ${Tables.gearListItem} where ${Columns.gearItemId} = ${Tables.gearItem}.${Columns.id} and ${Columns.gearListId} = ?)",
       whereArgs: [gearCategoryId.id, gearListId.id],
       orderBy: Columns.sortIndex,
@@ -321,8 +283,10 @@ class GearCategoryAccessor extends TableAccessor<GearCategoryId, GearCategory> {
 
   @override
   Future<List<GearCategory>> getAll(bool orderById) async {
-    final data = await TableAccessor.database
-        .query(tableName, orderBy: orderById ? Columns.id : Columns.sortIndex);
+    final data = await TableAccessor.database.query(
+      tableName,
+      orderBy: orderById ? Columns.id : Columns.sortIndex,
+    );
     return data.map(fromDbRecord).toList();
   }
 

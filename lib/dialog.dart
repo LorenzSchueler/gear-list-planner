@@ -25,8 +25,7 @@ Future<bool> showDeleteWarningDialog(
   BuildContext context,
   String entityName,
   String? message,
-) =>
-    showWarningDialog(context, "Delete $entityName?", message, "Delete");
+) => showWarningDialog(context, "Delete $entityName?", message, "Delete");
 
 Future<bool> showWarningDialog(
   BuildContext context,
@@ -43,9 +42,7 @@ Future<bool> showWarningDialog(
         TextButton(
           child: Text(
             "Cancel",
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.error,
-            ),
+            style: TextStyle(color: Theme.of(context).colorScheme.error),
           ),
           onPressed: () => Navigator.of(context).pop(false),
         ),
@@ -93,10 +90,7 @@ Future<ExportMode?> showExportDialog(BuildContext context) {
   );
 }
 
-Future<String?> showNameDialog(
-  BuildContext context,
-  String? initialName,
-) {
+Future<String?> showNameDialog(BuildContext context, String? initialName) {
   return showDialog<String>(
     context: context,
     builder: (_) => _NameDialog(initialName: initialName),
@@ -104,9 +98,7 @@ Future<String?> showNameDialog(
 }
 
 class _NameDialog extends StatefulWidget {
-  const _NameDialog({
-    required this.initialName,
-  });
+  const _NameDialog({required this.initialName});
 
   final String? initialName;
 
@@ -150,9 +142,7 @@ class _NameDialogState extends State<_NameDialog> {
             onPressed: _formKey.currentState?.validate() ?? false
                 ? () => Navigator.of(context).pop(_name)
                 : null,
-            child: Text(
-              widget.initialName != null ? "Update" : "Create",
-            ),
+            child: Text(widget.initialName != null ? "Update" : "Create"),
           ),
         ],
       ),
@@ -274,9 +264,7 @@ Future<(String, GearListId?)?> showCloneDialog(
 ) {
   return showDialog<(String, GearListId?)>(
     context: context,
-    builder: (_) => _CloneDialog(
-      lists: lists,
-    ),
+    builder: (_) => _CloneDialog(lists: lists),
   );
 }
 
@@ -319,17 +307,20 @@ class _CloneDialogState extends State<_CloneDialog> {
               "You can create a new list by cloning an existing one or create one from scratch.",
             ),
             DropdownButtonFormField(
-              items: widget.lists
-                  .map(
-                    (v) => DropdownMenuItem(
-                      value: v.id,
-                      child: Text("clone ${v.name}"),
+              items:
+                  widget.lists
+                      .map(
+                        (v) => DropdownMenuItem(
+                          value: v.id,
+                          child: Text("clone ${v.name}"),
+                        ),
+                      )
+                      .toList()
+                    ..add(
+                      const DropdownMenuItem(
+                        child: Text("create from scratch"),
+                      ),
                     ),
-                  )
-                  .toList()
-                ..add(
-                  const DropdownMenuItem(child: Text("create from scratch")),
-                ),
               onChanged: (listId) => setState(() => _listId = listId),
             ),
           ],

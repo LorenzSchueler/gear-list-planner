@@ -7,10 +7,7 @@ import 'package:gear_list_planner/model.dart';
 import 'package:provider/provider.dart';
 
 class GearListCompareLoadWrapper extends StatelessWidget {
-  const GearListCompareLoadWrapper({
-    super.key,
-    required this.gearListIds,
-  });
+  const GearListCompareLoadWrapper({super.key, required this.gearListIds});
 
   final (GearListId, GearListId) gearListIds;
 
@@ -87,8 +84,9 @@ class _GearListCompare extends StatelessWidget {
                     },
                   ),
                   SliverToBoxAdapter(
-                    child:
-                        _SummaryCard(categoriesWithItems: categoriesWithItems),
+                    child: _SummaryCard(
+                      categoriesWithItems: categoriesWithItems,
+                    ),
                   ),
                 ],
               ),
@@ -170,9 +168,7 @@ class _CategoryCard extends StatelessWidget {
 }
 
 class _SummaryCard extends StatelessWidget {
-  const _SummaryCard({
-    required this.categoriesWithItems,
-  });
+  const _SummaryCard({required this.categoriesWithItems});
 
   final List<GearCategoryWithCompareItems> categoriesWithItems;
 

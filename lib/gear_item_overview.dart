@@ -11,10 +11,7 @@ class GearItemOverview extends StatelessWidget {
 
   static Widget fab(BuildContext context) {
     return FloatingActionButton(
-      onPressed: () => _createCategory(
-        context,
-        GearCategoryDataProvider(),
-      ),
+      onPressed: () => _createCategory(context, GearCategoryDataProvider()),
       child: const Icon(Icons.add_rounded),
     );
   }
@@ -59,10 +56,10 @@ class GearItemOverview extends StatelessWidget {
                     },
                     onReorder: (oldIndex, newIndex) =>
                         dataProvider.gearCategoryDataProvider.reorder(
-                      gearCategoriesWithItems.map((c) => c.$1).toList(),
-                      oldIndex,
-                      newIndex,
-                    ),
+                          gearCategoriesWithItems.map((c) => c.$1).toList(),
+                          oldIndex,
+                          newIndex,
+                        ),
                   ),
                   SliverToBoxAdapter(
                     child: Align(
@@ -149,29 +146,18 @@ class _CategoryCard extends StatelessWidget {
                   ),
                 ),
                 IconButton(
-                  onPressed: () => _editCategory(
-                    context,
-                    gearCategory,
-                  ),
+                  onPressed: () => _editCategory(context, gearCategory),
                   icon: const Icon(Icons.edit_rounded),
                 ),
                 IconButton(
-                  onPressed: () => _deleteCategory(
-                    context,
-                    gearCategory,
-                  ),
+                  onPressed: () => _deleteCategory(context, gearCategory),
                   icon: const Icon(Icons.delete_rounded),
                 ),
               ],
             ),
             _ItemInput(
-              onAdd: (type, name, weight) => _createItem(
-                context,
-                gearCategory,
-                type,
-                name,
-                weight,
-              ),
+              onAdd: (type, name, weight) =>
+                  _createItem(context, gearCategory, type, name, weight),
             ),
             const SizedBox(height: 10),
             Expanded(
@@ -195,9 +181,7 @@ class _CategoryCard extends StatelessWidget {
                               gearItem.type,
                               style: Theme.of(context).textTheme.bodyLarge,
                             ),
-                            HoverScrollingText(
-                              gearItem.name,
-                            ),
+                            HoverScrollingText(gearItem.name),
                           ],
                         ),
                       ),
@@ -207,28 +191,19 @@ class _CategoryCard extends StatelessWidget {
                         style: Theme.of(context).textTheme.bodyLarge,
                       ),
                       IconButton(
-                        onPressed: () => _editItem(
-                          context,
-                          gearItem,
-                        ),
+                        onPressed: () => _editItem(context, gearItem),
                         icon: const Icon(Icons.edit_rounded),
                       ),
                       IconButton(
-                        onPressed: () => _deleteItem(
-                          context,
-                          gearItem,
-                        ),
+                        onPressed: () => _deleteItem(context, gearItem),
                         icon: const Icon(Icons.delete_rounded),
                       ),
                     ],
                   );
                 },
                 buildDefaultDragHandles: false,
-                onReorder: (oldIndex, newIndex) => gearItemDataProvider.reorder(
-                  gearItems,
-                  oldIndex,
-                  newIndex,
-                ),
+                onReorder: (oldIndex, newIndex) =>
+                    gearItemDataProvider.reorder(gearItems, oldIndex, newIndex),
               ),
             ),
           ],
@@ -243,8 +218,9 @@ class _CategoryCard extends StatelessWidget {
   ) async {
     final name = await showNameDialog(context, gearCategory.name);
     if (name != null) {
-      final result =
-          await gearCategoryDataProvider.update(gearCategory..name = name);
+      final result = await gearCategoryDataProvider.update(
+        gearCategory..name = name,
+      );
       if (result.isError && context.mounted) {
         await showMessageDialog(
           context,
@@ -390,8 +366,8 @@ class _ItemInputState extends State<_ItemInput> {
               validator: (weight) => weight == null || weight.isEmpty
                   ? 'please enter a weight'
                   : int.tryParse(weight) == null
-                      ? "not a valid weight"
-                      : null,
+                  ? "not a valid weight"
+                  : null,
             ),
           ),
           IconButton(

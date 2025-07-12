@@ -104,7 +104,8 @@ class Table {
   List<Column> columns;
   List<String> uniqueColumns;
 
-  String get setupSql => """
+  String get setupSql =>
+      """
     create table $name(
       ${columns.map((c) => c.setupSql).join(',\n')},
       unique(${uniqueColumns.join(', ')})
@@ -114,12 +115,12 @@ class Table {
 class Column {
   Column.intColumn(String column) : setupSql = "$column $_integer";
   Column.boolColumn(String column)
-      : setupSql = "$column $_integer check($column in (0, 1))";
+    : setupSql = "$column $_integer check($column in (0, 1))";
   Column.fkColumn(String column, String table)
-      : setupSql = "$column $_integer references $table on delete cascade";
+    : setupSql = "$column $_integer references $table on delete cascade";
   Column.stringColumn(String column) : setupSql = "$column $_string";
   Column.idColumn()
-      : setupSql = "${Columns.id} $_integer primary key autoincrement";
+    : setupSql = "${Columns.id} $_integer primary key autoincrement";
 
   static const _integer = "integer not null";
   static const _string = "text not null";

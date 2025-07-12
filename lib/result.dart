@@ -1,9 +1,7 @@
 import 'package:sqflite/sqflite.dart';
 
 class Result<T> {
-  Result.success(T this.success)
-      : error = null,
-        errorMessage = null;
+  Result.success(T this.success) : error = null, errorMessage = null;
   Result.error(ErrorType this.error, String this.errorMessage) : success = null;
 
   static Future<Result<T>> from<T>(Future<T> Function() fn) async {

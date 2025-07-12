@@ -129,8 +129,9 @@ class _AppState extends State<App> with TickerProviderStateMixin {
     }
     setState(() {
       _gearListCompare = gearListCompare;
-      _navigationTab =
-          gearListCompare.$2 != null ? Tab.listCompare : Tab.listOverview;
+      _navigationTab = gearListCompare.$2 != null
+          ? Tab.listCompare
+          : Tab.listOverview;
     });
   }
 
@@ -139,7 +140,8 @@ class _AppState extends State<App> with TickerProviderStateMixin {
   Future<void> _openFile() async {
     final dataProvider = ModelDataProvider();
     final empty = await dataProvider.isEmpty();
-    final open = empty ||
+    final open =
+        empty ||
         mounted &&
             await showWarningDialog(
               context,
@@ -156,11 +158,7 @@ class _AppState extends State<App> with TickerProviderStateMixin {
       });
       final result = await dataProvider.loadModel();
       if (result.isError && mounted) {
-        await showMessageDialog(
-          context,
-          "Invalid Data",
-          result.errorMessage!,
-        );
+        await showMessageDialog(context, "Invalid Data", result.errorMessage!);
       }
       setState(() => _isOpening = false);
     }
@@ -219,9 +217,8 @@ class _AppState extends State<App> with TickerProviderStateMixin {
                 preferredSize: const Size(double.infinity, 65),
                 child: NavigationBar(
                   selectedIndex: _navigationTab.index,
-                  onDestinationSelected: (index) => setState(
-                    () => _navigationTab = Tab.values[index],
-                  ),
+                  onDestinationSelected: (index) =>
+                      setState(() => _navigationTab = Tab.values[index]),
                   destinations: <Widget>[
                     const NavigationDestination(
                       label: "Lists",
@@ -249,76 +246,76 @@ class _AppState extends State<App> with TickerProviderStateMixin {
           ? const Center(child: CircularProgressIndicator())
           : switch (_navigationTab) {
               Tab.listOverview => GearListOverview(
-                  onSelectGearList: _setGearList,
-                  onToggleCompareGearList: _toggleCompareGearList,
-                  selectedCompare: _gearListCompare,
-                ),
+                onSelectGearList: _setGearList,
+                onToggleCompareGearList: _toggleCompareGearList,
+                selectedCompare: _gearListCompare,
+              ),
               Tab.itemOverview => const GearItemOverview(),
-              Tab.listDetails => detailsChosen
-                  ? GearListDetailsLoadWrapper(
-                      gearListId: _gearList!.id,
-                    )
-                  : Center(
-                      child: RichText(
-                        text: const TextSpan(
-                          children: [
-                            TextSpan(
-                              text:
-                                  "Select a list in the list overview by clicking on ",
-                            ),
-                            WidgetSpan(
-                              child: Icon(Icons.open_in_new, size: 16),
-                            ),
-                          ],
+              Tab.listDetails =>
+                detailsChosen
+                    ? GearListDetailsLoadWrapper(gearListId: _gearList!.id)
+                    : Center(
+                        child: RichText(
+                          text: const TextSpan(
+                            children: [
+                              TextSpan(
+                                text:
+                                    "Select a list in the list overview by clicking on ",
+                              ),
+                              WidgetSpan(
+                                child: Icon(Icons.open_in_new, size: 16),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-              Tab.listCompare => compareChosen
-                  ? GearListCompareLoadWrapper(
-                      gearListIds: (
-                        _gearListCompare.$1!.id,
-                        _gearListCompare.$2!.id
-                      ),
-                    )
-                  : Center(
-                      child: RichText(
-                        text: const TextSpan(
-                          children: [
-                            TextSpan(
-                              text:
-                                  "Select two lists for comparison in the list overview by clicking on ",
-                            ),
-                            WidgetSpan(
-                              child: Icon(Icons.compare_rounded, size: 16),
-                            ),
-                          ],
+              Tab.listCompare =>
+                compareChosen
+                    ? GearListCompareLoadWrapper(
+                        gearListIds: (
+                          _gearListCompare.$1!.id,
+                          _gearListCompare.$2!.id,
+                        ),
+                      )
+                    : Center(
+                        child: RichText(
+                          text: const TextSpan(
+                            children: [
+                              TextSpan(
+                                text:
+                                    "Select two lists for comparison in the list overview by clicking on ",
+                              ),
+                              WidgetSpan(
+                                child: Icon(Icons.compare_rounded, size: 16),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
               Tab.openSave => Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      FilledButton.icon(
-                        onPressed: _openFile,
-                        icon: const Icon(Icons.upload_file_rounded),
-                        label: const Text("Open"),
-                      ),
-                      FilledButton.icon(
-                        onPressed: _clearDb,
-                        icon: const Icon(Icons.delete_rounded),
-                        label: const Text("Clear"),
-                      ),
-                      FilledButton.icon(
-                        onPressed: () => ModelDataProvider().storeModel(),
-                        icon: const Icon(Icons.file_download_rounded),
-                        label: const Text("Save"),
-                      ),
-                    ],
-                  ),
+                padding: const EdgeInsets.all(10),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    FilledButton.icon(
+                      onPressed: _openFile,
+                      icon: const Icon(Icons.upload_file_rounded),
+                      label: const Text("Open"),
+                    ),
+                    FilledButton.icon(
+                      onPressed: _clearDb,
+                      icon: const Icon(Icons.delete_rounded),
+                      label: const Text("Clear"),
+                    ),
+                    FilledButton.icon(
+                      onPressed: () => ModelDataProvider().storeModel(),
+                      icon: const Icon(Icons.file_download_rounded),
+                      label: const Text("Save"),
+                    ),
+                  ],
                 ),
+              ),
             },
       floatingActionButton: mobile
           ? switch (_navigationTab) {
@@ -326,16 +323,15 @@ class _AppState extends State<App> with TickerProviderStateMixin {
               Tab.itemOverview => GearItemOverview.fab(context),
               Tab.listDetails => null,
               Tab.listCompare => null,
-              Tab.openSave => null
+              Tab.openSave => null,
             }
           : null,
       bottomNavigationBar: mobile
           ? BottomNavigationBar(
               type: BottomNavigationBarType.fixed,
               currentIndex: _navigationTab.index,
-              onTap: (index) => setState(
-                () => _navigationTab = Tab.values[index],
-              ),
+              onTap: (index) =>
+                  setState(() => _navigationTab = Tab.values[index]),
               items: [
                 const BottomNavigationBarItem(
                   label: "Lists",

@@ -9,10 +9,7 @@ import 'package:gear_list_planner/pdf_table.dart';
 import 'package:provider/provider.dart';
 
 class GearListDetailsLoadWrapper extends StatelessWidget {
-  const GearListDetailsLoadWrapper({
-    super.key,
-    required this.gearListId,
-  });
+  const GearListDetailsLoadWrapper({super.key, required this.gearListId});
 
   final GearListId gearListId;
 
@@ -68,10 +65,10 @@ class _GearListDetails extends StatelessWidget {
                       gearCategoryWithItems.nonSelectedItems;
                   final filteredSelectedItems = unpackedOnly.isOn
                       ? selectedItems
-                          .where(
-                            (listItemsAndItem) => !listItemsAndItem.$1.packed,
-                          )
-                          .toList()
+                            .where(
+                              (listItemsAndItem) => !listItemsAndItem.$1.packed,
+                            )
+                            .toList()
                       : selectedItems;
                   return _CategoryCard(
                     gearList: gearList,
@@ -96,11 +93,11 @@ class _GearListDetails extends StatelessWidget {
                           gearCategoryWithItems.nonSelectedItems;
                       final filteredSelectedItems = unpackedOnly.isOn
                           ? selectedItems
-                              .where(
-                                (listItemsAndItem) =>
-                                    !listItemsAndItem.$1.packed,
-                              )
-                              .toList()
+                                .where(
+                                  (listItemsAndItem) =>
+                                      !listItemsAndItem.$1.packed,
+                                )
+                                .toList()
                           : selectedItems;
                       return _CategoryCard(
                         gearList: gearList,
@@ -189,9 +186,9 @@ class _CategoryCard extends StatelessWidget {
                         onPressed: gearList.readOnly || gearListItem.count <= 1
                             ? null
                             : () => _updateListItem(
-                                  context,
-                                  gearListItem..count -= 1,
-                                ),
+                                context,
+                                gearListItem..count -= 1,
+                              ),
                         icon: const Icon(Icons.remove),
                       ),
                       Text(
@@ -202,9 +199,9 @@ class _CategoryCard extends StatelessWidget {
                         onPressed: gearList.readOnly
                             ? null
                             : () => _updateListItem(
-                                  context,
-                                  gearListItem..count += 1,
-                                ),
+                                context,
+                                gearListItem..count += 1,
+                              ),
                         icon: const Icon(Icons.add),
                       ),
                       const SizedBox(width: 10),
@@ -216,9 +213,7 @@ class _CategoryCard extends StatelessWidget {
                               gearItem.type,
                               style: Theme.of(context).textTheme.bodyLarge,
                             ),
-                            HoverScrollingText(
-                              gearItem.name,
-                            ),
+                            HoverScrollingText(gearItem.name),
                           ],
                         ),
                       ),
@@ -311,10 +306,7 @@ class _ListItemInputState extends State<_ListItemInput> {
     return Row(
       children: [
         // TODO workaround because DropdownMenu has no FocusNode
-        SizedBox(
-          width: 1,
-          child: TextFormField(focusNode: focusNode),
-        ),
+        SizedBox(width: 1, child: TextFormField(focusNode: focusNode)),
         Expanded(
           child: DropdownMenu(
             controller: dropdownTextController,
@@ -327,8 +319,9 @@ class _ListItemInputState extends State<_ListItemInput> {
                   ),
                 )
                 .toList(),
-            inputDecorationTheme:
-                const InputDecorationTheme(contentPadding: EdgeInsets.zero),
+            inputDecorationTheme: const InputDecorationTheme(
+              contentPadding: EdgeInsets.zero,
+            ),
             enableFilter: true,
             label: const Text("Name"),
             onSelected: (gearItem) {
@@ -381,8 +374,9 @@ class _SummaryCard extends StatelessWidget {
               onPressed: () async {
                 final style = await showExportDialog(context);
                 if (style != null) {
-                  await PdfTable(categoriesWithItems)
-                      .exportAsPdf(compact: style.isCompact);
+                  await PdfTable(
+                    categoriesWithItems,
+                  ).exportAsPdf(compact: style.isCompact);
                 }
               },
               child: const Text("Export As PDF"),
@@ -393,10 +387,7 @@ class _SummaryCard extends StatelessWidget {
                   value: gearList.readOnly,
                   onChanged: (readOnly) {
                     if (readOnly != null) {
-                      _updateList(
-                        context,
-                        gearList..readOnly = readOnly,
-                      );
+                      _updateList(context, gearList..readOnly = readOnly);
                     }
                   },
                 ),
