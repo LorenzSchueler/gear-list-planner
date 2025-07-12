@@ -55,7 +55,7 @@ class _InitAppWrapperState extends State<InitAppWrapper> {
       surfaceTintColor: Colors.transparent,
       indicatorColor: Colors.white,
     ),
-    cardTheme: const CardTheme(
+    cardTheme: const CardThemeData(
       margin: EdgeInsets.all(10),
       color: _surface,
       surfaceTintColor: Colors.transparent,

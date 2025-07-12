@@ -29,7 +29,7 @@ environment:
 # versions available, run `flutter pub outdated`.
 dependencies:
   collection: ^1.17.0
-  file_picker: ^8.0.6
+  file_picker: ^10.2.0
   flutter:
     sdk: flutter
   json_annotation: ^4.8.1
@@ -37,19 +37,19 @@ dependencies:
   provider: ^6.0.2 # state management
   sqflite: ^2.3.0
   sqflite_common_ffi: ^2.3.0+2
-  sqflite_common_ffi_web: ^0.4.0
+  sqflite_common_ffi_web: ^1.0.0
     # dart run sqflite_common_ffi_web:setup --force
   text_scroll: ^0.2.0
-  web: ^0.5.0
+  web: ^1.1.1
 
 
 dev_dependencies:
   build_runner: ^2.1.0
     # dart run build_runner build --delete-conflicting-outputs
-  flutter_lints: ^4.0.0
+  flutter_lints: ^6.0.0
   flutter_test:
     sdk: flutter
-  icons_launcher: ^2.0.1 
+  icons_launcher: ^3.0.1 
     # dart run icons_launcher:create
   json_serializable: ^6.3.0
 
