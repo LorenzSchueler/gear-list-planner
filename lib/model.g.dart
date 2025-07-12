@@ -7,7 +7,7 @@ part of 'model.dart';
 // **************************************************************************
 
 GearList _$GearListFromJson(Map<String, dynamic> json) => GearList(
-  id: GearListId(json['id'] as int),
+  id: GearListId((json['id'] as num).toInt()),
   name: json['name'] as String,
   notes: json['notes'] as String,
   readOnly: json['read_only'] as bool,
@@ -21,10 +21,10 @@ Map<String, dynamic> _$GearListToJson(GearList instance) => <String, dynamic>{
 };
 
 GearListItem _$GearListItemFromJson(Map<String, dynamic> json) => GearListItem(
-  id: GearListItemId(json['id'] as int),
-  gearItemId: GearItemId(json['gear_item_id'] as int),
-  gearListId: GearListId(json['gear_list_id'] as int),
-  count: json['count'] as int,
+  id: GearListItemId((json['id'] as num).toInt()),
+  gearItemId: GearItemId((json['gear_item_id'] as num).toInt()),
+  gearListId: GearListId((json['gear_list_id'] as num).toInt()),
+  count: (json['count'] as num).toInt(),
   packed: json['packed'] as bool,
 );
 
@@ -38,12 +38,12 @@ Map<String, dynamic> _$GearListItemToJson(GearListItem instance) =>
     };
 
 GearItem _$GearItemFromJson(Map<String, dynamic> json) => GearItem(
-  id: GearItemId(json['id'] as int),
-  gearCategoryId: GearCategoryId(json['gear_category_id'] as int),
+  id: GearItemId((json['id'] as num).toInt()),
+  gearCategoryId: GearCategoryId((json['gear_category_id'] as num).toInt()),
   name: json['name'] as String,
   type: json['type'] as String,
-  weight: json['weight'] as int,
-  sortIndex: json['sort_index'] as int,
+  weight: (json['weight'] as num).toInt(),
+  sortIndex: (json['sort_index'] as num).toInt(),
 );
 
 Map<String, dynamic> _$GearItemToJson(GearItem instance) => <String, dynamic>{
@@ -56,9 +56,9 @@ Map<String, dynamic> _$GearItemToJson(GearItem instance) => <String, dynamic>{
 };
 
 GearCategory _$GearCategoryFromJson(Map<String, dynamic> json) => GearCategory(
-  id: GearCategoryId(json['id'] as int),
+  id: GearCategoryId((json['id'] as num).toInt()),
   name: json['name'] as String,
-  sortIndex: json['sort_index'] as int,
+  sortIndex: (json['sort_index'] as num).toInt(),
 );
 
 Map<String, dynamic> _$GearCategoryToJson(GearCategory instance) =>
