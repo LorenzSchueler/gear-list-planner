@@ -45,7 +45,7 @@ class _InitAppWrapperState extends State<InitAppWrapper> {
       seedColor: Colors.blue,
       errorContainer: Colors.green,
     ),
-    appBarTheme: const AppBarTheme(color: _surface),
+    appBarTheme: const AppBarTheme(backgroundColor: _surface),
     bottomNavigationBarTheme: const BottomNavigationBarThemeData(
       backgroundColor: _surface,
       selectedItemColor: Colors.black,
