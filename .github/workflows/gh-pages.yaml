@@ -36,7 +36,7 @@ jobs:
       - name: flutter build web
         run: flutter build web --wasm --release --base-href /gear-list-planner/
       - name: configure pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
       - name: upload artifact
         uses: actions/upload-pages-artifact@v4
         with:
