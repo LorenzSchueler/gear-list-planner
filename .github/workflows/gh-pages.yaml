@@ -38,7 +38,7 @@ jobs:
       - name: configure pages
         uses: actions/configure-pages@v6
       - name: upload artifact
-        uses: actions/upload-pages-artifact@v4
+        uses: actions/upload-pages-artifact@v5
         with:
           path: ./build/web
       - name: deploy to gh pages
