@@ -54,7 +54,7 @@ class GearItemOverview extends StatelessWidget {
                         gearItemDataProvider: dataProvider.gearItemDataProvider,
                       );
                     },
-                    onReorder: (oldIndex, newIndex) =>
+                    onReorderItem: (oldIndex, newIndex) =>
                         dataProvider.gearCategoryDataProvider.reorder(
                           gearCategoriesWithItems.map((c) => c.$1).toList(),
                           oldIndex,
@@ -202,7 +202,7 @@ class _CategoryCard extends StatelessWidget {
                   );
                 },
                 buildDefaultDragHandles: false,
-                onReorder: (oldIndex, newIndex) =>
+                onReorderItem: (oldIndex, newIndex) =>
                     gearItemDataProvider.reorder(gearItems, oldIndex, newIndex),
               ),
             ),

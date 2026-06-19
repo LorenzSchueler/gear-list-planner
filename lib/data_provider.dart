@@ -219,7 +219,7 @@ class ModelDataProvider extends ChangeNotifier {
   String? _file; // filename on web, path on desktop
 
   Future<Result<String?>> _readFile() async {
-    final result = await FilePicker.platform.pickFiles(
+    final result = await FilePicker.pickFiles(
       withData: true,
       type: FileType.custom,
       allowedExtensions: ["json"],
